@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-  import { ref } from "vue";
+  import { ref } from "vue"
 
   const days = ref(0)
   const valid = ref(false)
@@ -106,3 +106,7 @@
     console.log('valid', valid)
   }
 </script>
+
+<style scoped>
+
+</style>

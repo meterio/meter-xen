@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center px-0">
     <v-responsive
-      max-width="500"
+      :max-width="maxWidth"
       class="fill-height">
 
       <v-row justify="space-between" class="text-center">
@@ -27,6 +27,10 @@
 <script setup>
   import { computed, ref } from "vue"
   import { useRouter, useRoute } from "vue-router"
+  import { useDisplay } from "vuetify"
+  import useMaxWidth from "@/hooks/useMaxWidth"
+
+  const maxWidth = useMaxWidth()
 
   const route = useRoute()
   const router = useRouter()
