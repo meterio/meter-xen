@@ -94,22 +94,50 @@
 </template>
 
 <script setup>
-  import { ref } from "vue";
+  import { useMintStore } from "@/store/mint";
+  import { ref, toRefs } from "vue";
 
-  const reward = ref(0)
+  const mintStore = useMintStore()
+
+  // const reward = ref(0)
   const penalty = ref(0)
+  const props = defineProps({
+    reward: Number
+  })
+
+  const { reward } = toRefs(props)
 
   const percentageValid = ref(false)
   const percentage = ref(0)
   const percentageRef = ref(null)
-  const percentageRules = []
-  const maxStakePercentage = () => {}
+  const percentageRules = [
+    v => !!v || 'percentage is required',
+    v => (v && !isNaN(Number(v))) || 'percentage must be a number',
+    v => (Number(v) > 0) || 'percentage must great than 0',
+    v => (Number(v) <= 100) || 'percentage must less than or equal 100'
+  ]
+  const maxStakePercentage = () => {
+    percentage.value = 100
+  }
 
   const daysValid = ref(false)
   const days = ref(0)
-  const daysRules = []
+  const daysRules = [
+    v => !!v || 'days is required',
+    v => (v && !isNaN(Number(v))) || 'days must be a number',
+    v => (Number(v) > 0) || 'days must great than 0',
+    v => (Number(v) <= 1000) || 'days must less than or equal 1000'
+  ]
   const stakeDaysRef = ref(null)
-  const maxStakeDays = () => {}
+  const maxStakeDays = () => {
+    days.value = 1000
+  }
 
-  const mintStake = () => {}
+  const mintStake = async () => {
+    await percentageRef.value.validate()
+    await stakeDaysRef.value.validate()
+    if (percentageValid.value && daysValid.value) {
+      mintStore.claimMintRewardAndStake(percentage.value, days.value)
+    }
+  }
 </script>

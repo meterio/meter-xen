@@ -2,19 +2,19 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Staking</v-card-title>
 
-    <section class="d-flex justify-space-between">
+    <!-- <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">Matures in</span>
       <span>0</span>
-    </section>
+    </section> -->
 
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex flex-column justify-space-between">
       <div class="d-flex justify-space-between">
         <span class="text-subtitle-2">Progress</span>
-        <span>0.00%</span>
+        <span>{{ maturityPer }}%</span>
       </div>
-      <v-progress-linear class="mt-2" :model-value="progressPercent" color="primary" height="10" rounded></v-progress-linear>
+      <v-progress-linear class="mt-2" :model-value="maturityPer" color="primary" height="10" rounded></v-progress-linear>
     </section>
 
     <v-divider class="my-6"></v-divider>
@@ -28,21 +28,21 @@
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">Staked XEN</span>
-      <span>0</span>
+      <span>{{ stakedAmount }}</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">APY</span>
-      <span>0.00%</span>
+      <span>{{ apy }}%</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">Term</span>
-      <span>0</span>
+      <span>{{ term }}</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
@@ -51,6 +51,9 @@
 
 <script setup>
   import { ref } from "vue";
+  import { useStakeStore } from "@/store/stake";
+  import { storeToRefs } from "pinia";
 
-  const progressPercent = ref(10)
+  const stakeStore = useStakeStore()
+  const { term, stakedAmount, apy, maturityPer } = storeToRefs(stakeStore)
 </script>

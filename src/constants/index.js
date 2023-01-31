@@ -1,0 +1,1 @@
+export const maximum_approve_amount = "0x" + "f".repeat(64);

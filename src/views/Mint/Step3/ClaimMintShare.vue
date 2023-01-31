@@ -91,21 +91,47 @@
 </template>
 
 <script setup>
-  import { ref } from "vue";
+  import { useMintStore } from "@/store/mint";
+  import { ethers } from "ethers";
+  import { ref, toRefs } from "vue";
 
-  const reward = ref(0)
+  const mintStore = useMintStore()
+
+  // const reward = ref(0)
   const penalty = ref(0)
+  const props = defineProps({
+    reward: Number
+  })
+
+  const { reward } = toRefs(props)
 
   const percentageRef = ref(null)
   const percentValid = ref(false)
   const percentage = ref(0)
-  const percentageRules = []
-  const maxStakePercentage = () => {}
+  const percentageRules = [
+    v => !!v || 'percentage is required',
+    v => (v && !isNaN(Number(v))) || 'percentage must be a number',
+    v => (Number(v) > 0) || 'percentage must great than 0',
+    v => (Number(v) <= 100) || 'percentage must less than or equal 100'
+  ]
+  const maxStakePercentage = () => {
+    percentage.value = 100
+  }
 
   const walletAddrRef = ref(null)
   const walletAddrValid = ref(false)
   const walletAddr = ref('')
-  const walletAddrRules = []
+  const walletAddrRules = [
+    v => !!v || 'wallet address is required',
+    v => ethers.utils.isAddress(v) || 'wrong address'
+  ]
 
-  const mintShare = () => {}
+  const mintShare = async () => {
+    await percentageRef.value.validate()
+    await walletAddrRef.value.validate()
+    
+    if (percentValid.value && walletAddrValid.value) {
+      mintStore.claimMintRewardAndShare(walletAddr.value, percentage.value)
+    }
+  }
 </script>

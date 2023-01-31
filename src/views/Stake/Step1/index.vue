@@ -13,7 +13,7 @@
         lazy-validation
       >
         <v-text-field
-          v-model="amount"
+          v-model="stakeAmount"
           :rules="amountRules"
           label="amount"
           required
@@ -65,7 +65,7 @@
         >
           <div class="d-flex flex-column justify-space-between fill-height">
             <span class="text-subtitle-2">Yield</span>
-            <span class="text-body-2">{{ yieldPercent }}</span>
+            <span class="text-body-2">{{ yieldPercent }}%</span>
           </div>
         </v-sheet>
       </v-col>
@@ -78,7 +78,7 @@
         >
           <div class="d-flex flex-column justify-space-between fill-height">
             <span class="text-subtitle-2">Maturity</span>
-            <span class="text-body-2">{{ maturity }} Days</span>
+            <span class="text-body-2">{{ days }} Days</span>
           </div>
         </v-sheet>
       </v-col>
@@ -108,13 +108,25 @@
 </template>
 
 <script setup>
-  import { ref } from "vue";
+  import { computed, ref } from "vue";
+  import { useStakeStore } from "@/store/stake"
+  import { storeToRefs } from "pinia";
+
+  const stakeStore = useStakeStore()
+  const { maxTerm, amount, currentAPY } = storeToRefs(stakeStore)
 
   const amountRef = ref(null)
+  const stakeAmount = ref(0)
   const amountValid = ref(false)
-  const amount = ref(0)
-  const amountRules = []
-  const maxAmount = () => {}
+  const amountRules = [
+    v => !!v || 'amount is required',
+    v => (v && !isNaN(Number(v))) || 'amount must be a number',
+    v => (Number(v) > 0) || 'amount must great than 0',
+    v => (Number(v) <= amount.value) || 'insufficient balance'
+  ]
+  const maxAmount = () => {
+    stakeAmount.value = amount.value
+  }
 
   const daysRef = ref(null)
   const daysValid = ref(false)
@@ -122,17 +134,23 @@
   const daysRules = [
     v => !!v || 'days is required',
     v => (v && !isNaN(Number(v))) || 'days must be a number',
-    v => (Number(v) > 0) || 'days must great than zero'
+    v => (Number(v) > 0) || 'days must great than 0'
   ];
   const maxDays = () => {
-    days.value = 100
+    days.value = maxTerm.value
   }
 
-  const yieldPercent = ref(0)
-  const maturity = ref(0)
+  const yieldPercent = computed(() => {
+    const rate = currentAPY.value * days.value * 1000000 / 365;
+    return (stakeAmount.value * rate / 100000000).toFixed(2);
+  })
 
   const startStake = async () => {
-    const { valid } = await amountRef.value.validate()
-    console.log('valid', valid)
+    await amountRef.value.validate()
+    await daysRef.value.validate()
+
+    if (amountValid.value && daysValid.value) {
+      stakeStore.stake(stakeAmount.value, days.value)
+    }
   }
 </script>

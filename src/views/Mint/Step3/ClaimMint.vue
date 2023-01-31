@@ -44,10 +44,20 @@
 </template>
 
 <script setup>
-  import { ref } from "vue";
+  import { useMintStore } from "@/store/mint";
+  import { ref, toRefs } from "vue";
 
-  const reward = ref(0)
+  const mintStore = useMintStore()
+
+  // const reward = ref(0)
   const penalty = ref(0)
+  const props = defineProps({
+    reward: Number
+  })
 
-  const claimMint = () => {}
+  const { reward } = toRefs(props)
+
+  const claimMint = () => {
+    mintStore.claimMintReward()
+  }
 </script>

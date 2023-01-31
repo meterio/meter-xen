@@ -61,11 +61,16 @@
 </template>
 
 <script setup>
+  import { useMintStore } from '@/store/mint'
+  import { useStakeStore } from '@/store/stake'
   import { useWalletStore } from '@/store/wallet'
   import { storeToRefs } from 'pinia'
-  import { computed, inject, reactive, ref } from 'vue'
+  import { computed, inject, ref } from 'vue'
   import { useRoute, useRouter } from "vue-router"
   import { useDisplay } from 'vuetify'
+
+  const mintStore = useMintStore()
+  const stakeStore = useStakeStore()
 
   const { mobile } = useDisplay()
   const router = useRouter()
@@ -87,14 +92,18 @@
 
   const listenLinkValue = (link) => {
     linkValue.value = link
-    console.log(link)
+    // console.log(link)
     if (linkValue.value === 0) {
+      mintStore.initData()
+
       router.push({
         name: 'MintStep1'
       })
     }
 
     if (linkValue.value === 1) {
+      stakeStore.initData()
+      
       router.push({
         name: 'StakeStep1'
       })
@@ -110,14 +119,6 @@
     } else {
       return ''
     }
-  })
-  
-  const items = computed(() => {
-    const data = []
-    if (shortAccount) {
-      data.push({ title: shortAccount.value })
-    }
-    return data
   })
 
   const connect = inject('connectWallet')

@@ -12,6 +12,7 @@
     "@web3-onboard/core": "^2.13.0",
     "@web3-onboard/injected-wallets": "^2.5.0",
     "@web3-onboard/walletconnect": "^2.2.2",
+    "ethers": "^5.7.2",
     "pinia": "^2.0.23",
     "roboto-fontface": "*",
     "vue": "^3.2.38",

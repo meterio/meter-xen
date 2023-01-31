@@ -2,12 +2,14 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Minting</v-card-title>
 
+    <v-divider class="my-6"></v-divider>
+
     <section class="d-flex flex-column justify-space-between">
       <div class="d-flex justify-space-between">
         <span class="text-subtitle-2">Progress</span>
-        <span>0.00%</span>
+        <span>{{ maturityPer }}%</span>
       </div>
-      <v-progress-linear class="mt-2" :model-value="progressPercent" color="primary" height="10" rounded></v-progress-linear>
+      <v-progress-linear class="mt-2" :model-value="maturityPer" color="primary" height="10" rounded></v-progress-linear>
     </section>
 
     <v-divider class="my-6"></v-divider>
@@ -21,28 +23,28 @@
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">Amplifier</span>
-      <span>0</span>
+      <span>{{ amplifier }}</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">EAA Rate</span>
-      <span>0.00%</span>
+      <span>{{ eaaRate }}%</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">Rank</span>
-      <span>0</span>
+      <span>{{ rank }}</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">Term</span>
-      <span>0</span>
+      <span>{{ term }}</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
@@ -50,7 +52,10 @@
 </template>
 
 <script setup>
+  import { useMintStore } from "@/store/mint";
+  import { storeToRefs } from "pinia";
   import { ref } from "vue";
 
-  const progressPercent = ref(10)
+  const mintStore =  useMintStore()
+  const { rank, term, amplifier, eaaRate, maturityPer } = storeToRefs(mintStore)
 </script>

@@ -38,7 +38,7 @@
         >
           <div class="d-flex flex-column justify-space-between fill-height">
             <span class="text-subtitle-2">Your Claim Rank</span>
-            <span class="text-body-2">{{ claimRank }}</span>
+            <span class="text-body-2">{{ rank }}</span>
           </div>
         </v-sheet>
       </v-col>
@@ -51,7 +51,7 @@
         >
           <div class="d-flex flex-column justify-space-between fill-height">
             <span class="text-subtitle-2">Maturity</span>
-            <span class="text-body-2">{{ maturity }} Days</span>
+            <span class="text-body-2">{{ days }} Days</span>
           </div>
         </v-sheet>
       </v-col>
@@ -82,6 +82,11 @@
 
 <script setup>
   import { ref } from "vue"
+  import { useMintStore } from "@/store/mint"
+  import { storeToRefs } from "pinia"
+
+  const mintStore = useMintStore()
+  const { maxTerm, rank } = storeToRefs(mintStore)
 
   const days = ref(0)
   const valid = ref(false)
@@ -89,21 +94,21 @@
   const daysRules = [
     v => !!v || 'days is required',
     v => (v && !isNaN(Number(v))) || 'days must be a number',
-    v => (Number(v) > 0) || 'days must great than zero'
+    v => (Number(v) > 0) || 'days must great than 0'
   ];
 
   const maxDays = () => {
-    days.value = 100
+    days.value = maxTerm.value
   }
-
-  const claimRank = ref(0)
-  const maturity = ref(0)
 
   const formRef = ref(null)
 
   const mint = async () => {
     const { valid } = await formRef.value.validate()
     console.log('valid', valid)
+    if (valid) {
+      mintStore.claimRank(days.value)
+    }
   }
 </script>
 
