@@ -16,7 +16,7 @@
 
     <section class="d-flex justify-space-between">
       <span class="text-subtitle-2">Estimated MEN</span>
-      <span>0</span>
+      <span>{{ grossReward }}</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
@@ -57,5 +57,5 @@
   import { ref } from "vue";
 
   const mintStore =  useMintStore()
-  const { rank, term, amplifier, eaaRate, maturityPer } = storeToRefs(mintStore)
+  const { rank, term, amplifier, eaaRate, maturityPer, grossReward } = storeToRefs(mintStore)
 </script>

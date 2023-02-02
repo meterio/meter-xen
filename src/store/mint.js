@@ -19,7 +19,6 @@ export const useMintStore = defineStore({
     eaaRate: 0,
     globalRank: 0,
     grossReward: 0,
-    mintReward: 0,
     penalty: 0,
     error: "",
 
@@ -67,13 +66,9 @@ export const useMintStore = defineStore({
 
       const rankDelta = Math.max(this.globalRank - this.rank, 2)
 
-      const grossReward = await xenContract.getGrossReward(rankDelta, this.amplifier, this.term, this.eaaRate)
+      const grossReward = await xenContract.getGrossReward(rankDelta, this.amplifier, this.term, this.eaaRate + 1000)
       console.log('gross reward', grossReward.toNumber())
       this.grossReward = grossReward.toNumber()
-
-      // console.log({rank: this.rank, term: this.term, maturityTs: this.maturityTs, amplifier: this.amplifier, eaaRate: this.eaaRate})
-      // const mintReward = await xenContract.calculateMintReward(this.rank, this.term, this.maturityTs, this.amplifier, this.eaaRate)
-      // console.log('mint reward', mintReward)
 
       // for step3 penalty
       if (!endTime.isZero()) {
