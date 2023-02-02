@@ -65,7 +65,7 @@
         >
           <div class="d-flex flex-column justify-space-between fill-height">
             <span class="text-subtitle-2">Yield</span>
-            <span class="text-body-2">{{ yieldPercent }}%</span>
+            <span class="text-body-2">{{ currentAPY }}%</span>
           </div>
         </v-sheet>
       </v-col>
@@ -101,6 +101,7 @@
       class="mt-4"
       color="primary"
       @click="startStake"
+      :loading="stakeLoading"
     >
       START STAKE
     </v-btn>
@@ -113,7 +114,7 @@
   import { storeToRefs } from "pinia";
 
   const stakeStore = useStakeStore()
-  const { maxTerm, amount, currentAPY } = storeToRefs(stakeStore)
+  const { maxTerm, amount, currentAPY, stakeLoading } = storeToRefs(stakeStore)
 
   const amountRef = ref(null)
   const stakeAmount = ref(0)
@@ -139,11 +140,6 @@
   const maxDays = () => {
     days.value = maxTerm.value
   }
-
-  const yieldPercent = computed(() => {
-    const rate = currentAPY.value * days.value * 1000000 / 365;
-    return (stakeAmount.value * rate / 100000000).toFixed(2);
-  })
 
   const startStake = async () => {
     await amountRef.value.validate()

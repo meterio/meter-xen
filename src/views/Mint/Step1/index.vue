@@ -2,6 +2,8 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Claim Rank</v-card-title>
 
+    <v-alert v-if="error" type="error">{{ error }}</v-alert>
+
     <v-sheet
       rounded
       color="grey-lighten-3"
@@ -74,6 +76,7 @@
       class="mt-4"
       color="primary"
       @click="mint"
+      :loading="mintLoading"
     >
       START MINT
     </v-btn>
@@ -86,7 +89,7 @@
   import { storeToRefs } from "pinia"
 
   const mintStore = useMintStore()
-  const { maxTerm, rank } = storeToRefs(mintStore)
+  const { maxTerm, rank, error, mintLoading } = storeToRefs(mintStore)
 
   const days = ref(0)
   const valid = ref(false)

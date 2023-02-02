@@ -32,6 +32,7 @@
       class="mt-4"
       color="primary"
       @click="endStake"
+      :loading="withdrawLoading"
     >
       <span v-if="maturityPer < 100">EARLY END STAKE</span>
       <span v-else>END STAKE</span>
@@ -45,9 +46,9 @@
   import { storeToRefs } from "pinia";
 
   const stakeStore = useStakeStore()
-  const { maturityPer } = storeToRefs(stakeStore)
+  const { maturityPer, reward, withdrawLoading } = storeToRefs(stakeStore)
 
-  const reward = ref(0)
+  // const reward = ref(0)
 
   const endStake = async () => {
     stakeStore.endStake()

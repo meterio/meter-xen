@@ -87,6 +87,7 @@
       class="mt-4"
       color="primary"
       @click="mintStake"
+      :loading="loading"
     >
     CLAIM MINT + STAKE
     </v-btn>
@@ -100,9 +101,11 @@
   const mintStore = useMintStore()
 
   // const reward = ref(0)
-  const penalty = ref(0)
+  // const penalty = ref(0)
   const props = defineProps({
-    reward: Number
+    reward: Number,
+    penalty: Number,
+    loading: Boolean
   })
 
   const { reward } = toRefs(props)

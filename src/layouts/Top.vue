@@ -28,7 +28,19 @@
       </v-tabs>
       <v-spacer></v-spacer>
       <section v-if="!mobile">
-        <v-chip v-if="wallet.networkName">{{ wallet.networkName }}</v-chip>
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-chip v-if="wallet.networkName" v-bind="props" link>{{ wallet.networkName }}</v-chip>
+          </template>
+          <v-card class="menu-container d-flex flex-column">
+            <v-chip
+              v-for="item in chains"
+              :key="item.networkId"
+              @click="setChain(item.networkId)"
+              class="ma-1"
+              link="">{{ item.name }}</v-chip>
+          </v-card>
+        </v-menu>
         <v-chip class="ml-2" @click="connect">
           <div v-if="shortAccount" class="d-flex">
             <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
@@ -68,6 +80,9 @@
   import { computed, inject, ref } from 'vue'
   import { useRoute, useRouter } from "vue-router"
   import { useDisplay } from 'vuetify'
+  import { chains } from '@/constants/chains'
+
+  const setChain = inject('setChain')
 
   const mintStore = useMintStore()
   const stakeStore = useStakeStore()
@@ -103,7 +118,7 @@
 
     if (linkValue.value === 1) {
       stakeStore.initData()
-      
+
       router.push({
         name: 'StakeStep1'
       })

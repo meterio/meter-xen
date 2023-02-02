@@ -74,7 +74,7 @@
         ></v-text-field>
       </v-form>
       <div class="d-flex justify-space-between">
-        <span class="text-body-2">Wallet address where you want to share your XEN</span>
+        <span class="text-body-2">Wallet address where you want to share your MEN</span>
       </div>
     </v-sheet>
 
@@ -84,6 +84,7 @@
       class="mt-4"
       color="primary"
       @click="mintShare"
+      :loading="loading"
     >
     CLAIM MINT + SHARE
     </v-btn>
@@ -98,9 +99,11 @@
   const mintStore = useMintStore()
 
   // const reward = ref(0)
-  const penalty = ref(0)
+  // const penalty = ref(0)
   const props = defineProps({
-    reward: Number
+    reward: Number,
+    penalty: Number,
+    loading: Boolean
   })
 
   const { reward } = toRefs(props)

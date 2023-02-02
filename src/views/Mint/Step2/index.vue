@@ -15,7 +15,7 @@
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
-      <span class="text-subtitle-2">Estimated XEN</span>
+      <span class="text-subtitle-2">Estimated MEN</span>
       <span>0</span>
     </section>
 

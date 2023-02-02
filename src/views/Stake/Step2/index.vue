@@ -20,14 +20,14 @@
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
-      <span class="text-subtitle-2">Liquid XEN</span>
-      <span>0</span>
+      <span class="text-subtitle-2">Liquid MEN</span>
+      <span> {{ totalStaked }}</span>
     </section>
 
     <v-divider class="my-6"></v-divider>
 
     <section class="d-flex justify-space-between">
-      <span class="text-subtitle-2">Staked XEN</span>
+      <span class="text-subtitle-2">Staked MEN</span>
       <span>{{ stakedAmount }}</span>
     </section>
 
@@ -55,5 +55,5 @@
   import { storeToRefs } from "pinia";
 
   const stakeStore = useStakeStore()
-  const { term, stakedAmount, apy, maturityPer } = storeToRefs(stakeStore)
+  const { term, stakedAmount, totalStaked, apy, maturityPer } = storeToRefs(stakeStore)
 </script>

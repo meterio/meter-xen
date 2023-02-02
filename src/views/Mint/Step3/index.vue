@@ -1,9 +1,9 @@
 <template>
-  <claim-mint :reward="grossReward" />
+  <claim-mint :reward="grossReward" :penalty="penalty" :loading="claimRewardLoading" />
 
-  <claim-mint-share :reward="grossReward" />
+  <claim-mint-share :reward="grossReward" :penalty="penalty" :loading="claimRewardAndShareLoading" />
 
-  <claim-mint-stake :reward="grossReward" />
+  <claim-mint-stake :reward="grossReward" :penalty="penalty" :loading="claimRewardAndStakeLoading" />
 </template>
 
 <script setup>
@@ -14,5 +14,7 @@
   import ClaimMintStake from "./ClaimMintStake.vue"
 
   const mintStore = useMintStore()
-  const { grossReward } = storeToRefs(mintStore)
+  const { grossReward, penalty, claimRewardLoading,
+    claimRewardAndShareLoading,
+    claimRewardAndStakeLoading } = storeToRefs(mintStore)
 </script>
