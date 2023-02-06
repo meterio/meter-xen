@@ -2,6 +2,8 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">End Stake</v-card-title>
 
+    <v-alert v-if="withdrawError" type="error">{{ withdrawError }}</v-alert>
+
     <v-sheet
       rounded
       color="grey-lighten-3"
@@ -46,7 +48,7 @@
   import { storeToRefs } from "pinia";
 
   const stakeStore = useStakeStore()
-  const { maturityPer, reward, withdrawLoading } = storeToRefs(stakeStore)
+  const { maturityPer, reward, withdrawLoading, withdrawError } = storeToRefs(stakeStore)
 
   // const reward = ref(0)
 

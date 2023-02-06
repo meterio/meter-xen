@@ -2,6 +2,8 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Claim Mint + Stake</v-card-title>
 
+    <v-alert v-if="claimStakeError" type="error">{{ claimStakeError }}</v-alert>
+
     <v-row>
       <v-col>
         <v-sheet
@@ -97,11 +99,12 @@
 <script setup>
   import { useMintStore } from "@/store/mint";
   import { ref, toRefs } from "vue";
+  import { storeToRefs } from "pinia";
 
   const mintStore = useMintStore()
 
-  // const reward = ref(0)
-  // const penalty = ref(0)
+  const { claimStakeError } = storeToRefs(mintStore)
+
   const props = defineProps({
     reward: Number,
     penalty: Number,

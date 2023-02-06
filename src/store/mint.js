@@ -20,7 +20,9 @@ export const useMintStore = defineStore({
     globalRank: 0,
     grossReward: 0,
     penalty: 0,
-    error: "",
+    claimError: "",
+    claimShareError: "",
+    claimStakeError: "",
 
     mintLoading: false,
     claimRewardLoading: false,
@@ -55,31 +57,30 @@ export const useMintStore = defineStore({
         this.rank = this.globalRank
       }
 
-      this.maturityTs = BigNumber.from(userMints.maturityTs).toNumber()
-      const endTime = BigNumber.from(userMints.maturityTs).mul(1000)
-      const nowTime = Date.now()
-      // console.log('now time', nowTime)
-      const totalTime = BigNumber.from(userMints.term).mul(24 * 3600 * 1000)
-      // console.log('percent', (endTime.sub(nowTime).toNumber() / totalTime.toNumber()).toFixed(2))
-      this.maturityPer = ((1 - (endTime.sub(nowTime).toNumber() / totalTime.toNumber())) * 100).toFixed(2)
-      console.log('maturityPer', this.maturityPer)
+      const maturityTs = BigNumber.from(userMints.maturityTs).toNumber()
+      if (maturityTs > 0) {
+        this.maturityTs = maturityTs
+        const endTime = BigNumber.from(userMints.maturityTs).mul(1000)
+        const nowTime = Date.now()
+        // console.log('now time', nowTime)
+        const totalTime = BigNumber.from(userMints.term).mul(24 * 3600 * 1000)
+        // console.log('percent', (endTime.sub(nowTime).toNumber() / totalTime.toNumber()).toFixed(2))
+        this.maturityPer = ((1 - (endTime.sub(nowTime).toNumber() / totalTime.toNumber())) * 100).toFixed(2)
+        console.log('maturityPer', this.maturityPer)
+  
+        const rankDelta = Math.max(this.globalRank - this.rank, 2)
+  
+        const grossReward = await xenContract.getGrossReward(rankDelta, this.amplifier, this.term, this.eaaRate + 1000)
+        console.log('gross reward', grossReward.toNumber())
+        this.grossReward = grossReward.toNumber()
 
-      const rankDelta = Math.max(this.globalRank - this.rank, 2)
-
-      const grossReward = await xenContract.getGrossReward(rankDelta, this.amplifier, this.term, this.eaaRate + 1000)
-      console.log('gross reward', grossReward.toNumber())
-      this.grossReward = grossReward.toNumber()
-
-      // for step3 penalty
-      if (!endTime.isZero()) {
+        // for step3 penalty
         const lateSecs = (nowTime - endTime) / 1000
         if (lateSecs > 0) {
           const penalty = await xenContract.getPenalty(lateSecs.toFixed())
           this.penalty = BigNumber.from(penalty).toNumber()
         }
-      }
 
-      if (endTime.gt(0)) {
         if (endTime.lt(nowTime)) {
           router.push({
             name: "MintStep3"
@@ -97,10 +98,6 @@ export const useMintStore = defineStore({
     },
     async claimRank(term) {
       try {
-        if (this.user !== zero_address) {
-          this.error = "You already minted."
-          return
-        }
         this.mintLoading = true
         console.log('term', term)
         const { xenContract, wallet } = useWalletStore()
@@ -108,6 +105,14 @@ export const useMintStore = defineStore({
         const mintValue = await xenContract.mintValue()
         const network = chains.find(c => c.networkId === wallet.networkId)
         const mtrgContract = new ethers.Contract(network.mtrgAddr, xenABI, wallet.signer)
+
+        const mtrgBalance = await mtrgContract.balanceOf(wallet.account)
+        if (BigNumber.from(mintValue).gt(mtrgBalance)) {
+          this.error = "Insufficient MTRG balance."
+          this.mintLoading = false
+          return
+        }
+
         const allowance = await mtrgContract.allowance(wallet.account, network.contract)
         if (BigNumber.from(allowance).lt(mintValue)) {
           await (await mtrgContract.approve(network.contract, mintValue)).wait()
@@ -128,6 +133,10 @@ export const useMintStore = defineStore({
       }
     },
     async claimMintReward() {
+      if (this.maturityPer < 100) {
+        return this.claimError = "No MEN available to claim yet"
+      }
+      this.claimError = ""
       try {
         this.claimRewardLoading = true
 
@@ -142,6 +151,10 @@ export const useMintStore = defineStore({
       }
     },
     async claimMintRewardAndShare(address, pct) {
+      if (this.maturityPer < 100) {
+        return this.claimShareError = "No MEN available to claim yet"
+      }
+      this.claimShareError = ""
       try {
         this.claimRewardAndShareLoading = true
 
@@ -155,6 +168,10 @@ export const useMintStore = defineStore({
       }
     },
     async claimMintRewardAndStake(pct, term) {
+      if (this.maturityPer < 100) {
+        return this.claimStakeError = "No MEN available to claim yet"
+      }
+      this.claimStakeError = ""
       try {
         this.claimRewardAndStakeLoading = true
 

@@ -46,7 +46,7 @@
             <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
             <span>{{ shortAccount }}</span>
           </div>
-          <div v-else>NO CONNECT</div>
+          <div v-else>No Wallet Connected</div>
         </v-chip>
       </section>
       <v-menu v-else>
@@ -65,7 +65,7 @@
               <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
               <span>{{ shortAccount }}</span>
             </div>
-            <div v-else>NO CONNECT</div>
+            <div v-else>No Wallet Connected</div>
           </v-chip>
         </v-card>
       </v-menu>

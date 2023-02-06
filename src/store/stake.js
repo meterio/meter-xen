@@ -18,7 +18,9 @@ export const useStakeStore = defineStore({
     dayInYear: 365,
 
     stakeLoading: false,
-    withdrawLoading: false
+    withdrawLoading: false,
+
+    withdrawError: "",
   }),
   getters: {},
   actions: {
@@ -39,24 +41,23 @@ export const useStakeStore = defineStore({
       this.totalStaked = BigNumber.from(totalStaked).div((10 ** 18).toString()).toString()
       // console.log('currentAPY', currentAPY)
       this.currentAPY = BigNumber.from(currentAPY).toNumber()
-      this.term = BigNumber.from(userStakes.term).toNumber()
       this.amount = BigNumber.from(amount).div((10 ** 18).toString()).toNumber()
       // console.log('userStakes.amount', userStakes.amount)
-      this.stakedAmount = BigNumber.from (userStakes.amount).div((10 ** 18).toString()).toNumber()
-      this.apy = BigNumber.from(userStakes.apy).toNumber()
       // console.log('dayInYear', BigNumber.from(dayInYear).toNumber())
       this.dayInYear = BigNumber.from(dayInYear).toNumber()
-
+      
       const endTime = BigNumber.from(userStakes.maturityTs).mul(1000)
-      const nowTime = Date.now()
-      const totalTime = BigNumber.from(userStakes.term).mul(24 * 3600 * 1000)
-      this.maturityPer = ((1 - (endTime.sub(nowTime).toNumber() / totalTime.toNumber())) * 100).toFixed(2)
-      console.log('maturityPer', this.maturityPer)
-
-      const rate = this.apy * this.term * 1000000 / this.dayInYear;
-      this.reward = (this.stakedAmount * rate / 100000000).toFixed(2);
-
       if (endTime.gt(0)) {
+        this.term = BigNumber.from(userStakes.term).toNumber()
+        this.stakedAmount = BigNumber.from (userStakes.amount).div((10 ** 18).toString()).toNumber()
+        this.apy = BigNumber.from(userStakes.apy).toNumber()
+        const nowTime = Date.now()
+        const totalTime = BigNumber.from(userStakes.term).mul(24 * 3600 * 1000)
+        this.maturityPer = ((1 - (endTime.sub(nowTime).toNumber() / totalTime.toNumber())) * 100).toFixed(2)
+        console.log('maturityPer', this.maturityPer)
+        const rate = this.apy * this.term * 1000000 / this.dayInYear;
+        this.reward = (this.stakedAmount * rate / 100000000).toFixed(2);
+
         if (endTime.lt(nowTime)) {
           router.push({
             name: "StakeStep3"
@@ -88,6 +89,9 @@ export const useStakeStore = defineStore({
       }
     },
     async endStake() {
+      if (this.stakedAmount === 0) {
+        return this.withdrawError = "No stake exists"
+      }
       try {
         this.withdrawLoading = true
 

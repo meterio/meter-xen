@@ -2,6 +2,8 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Claim Mint + Share</v-card-title>
 
+    <v-alert v-if="claimShareError" type="error">{{ claimShareError }}</v-alert>
+
     <v-row>
       <v-col>
         <v-sheet
@@ -95,11 +97,12 @@
   import { useMintStore } from "@/store/mint";
   import { ethers } from "ethers";
   import { ref, toRefs } from "vue";
+  import { storeToRefs } from "pinia";
 
   const mintStore = useMintStore()
 
-  // const reward = ref(0)
-  // const penalty = ref(0)
+  const { claimShareError } = storeToRefs(mintStore)
+
   const props = defineProps({
     reward: Number,
     penalty: Number,

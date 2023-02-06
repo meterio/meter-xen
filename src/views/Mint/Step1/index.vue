@@ -2,7 +2,7 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Claim Rank</v-card-title>
 
-    <v-alert v-if="error" type="error">{{ error }}</v-alert>
+    <v-alert v-if="!!term" type="warning">This address has already minted MEN</v-alert>
 
     <v-sheet
       rounded
@@ -77,6 +77,7 @@
       color="primary"
       @click="mint"
       :loading="mintLoading"
+      :disabled="!!term"
     >
       START MINT
     </v-btn>
@@ -84,12 +85,12 @@
 </template>
 
 <script setup>
-  import { ref } from "vue"
+  import { ref, watch } from "vue"
   import { useMintStore } from "@/store/mint"
   import { storeToRefs } from "pinia"
 
   const mintStore = useMintStore()
-  const { maxTerm, rank, error, mintLoading } = storeToRefs(mintStore)
+  const { maxTerm, rank, term, mintLoading, maturityTs } = storeToRefs(mintStore)
 
   const days = ref(0)
   const valid = ref(false)
@@ -105,6 +106,15 @@
   }
 
   const formRef = ref(null)
+
+  watch(maturityTs, (ts) => {
+    if (ts > 0) {
+      const t = (ts * 1000) - Date.now()
+      if (t > 0) {
+        days.value = Math.ceil(t / (24 * 3600 * 1000))
+      }
+    }
+  }, {immediate: true})
 
   const mint = async () => {
     const { valid } = await formRef.value.validate()

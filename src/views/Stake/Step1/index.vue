@@ -2,6 +2,8 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Start Stake</v-card-title>
 
+    <v-alert v-if="!!term" type="warning">This address has already staked MEN</v-alert>
+
     <v-sheet
       rounded
       color="grey-lighten-3"
@@ -102,6 +104,7 @@
       color="primary"
       @click="startStake"
       :loading="stakeLoading"
+      :disabled="!!term"
     >
       START STAKE
     </v-btn>
@@ -114,7 +117,7 @@
   import { storeToRefs } from "pinia";
 
   const stakeStore = useStakeStore()
-  const { maxTerm, amount, currentAPY, stakeLoading } = storeToRefs(stakeStore)
+  const { maxTerm, amount, currentAPY, stakeLoading, stakeError, term } = storeToRefs(stakeStore)
 
   const amountRef = ref(null)
   const stakeAmount = ref(0)
