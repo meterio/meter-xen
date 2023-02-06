@@ -8,7 +8,7 @@ export const chains = [
     nativeTokenSymbol: "MTR",
     nativeTokenDecimals: 18,
     contract: "",
-    mtrgAddr: ""
+    mtrgAddr: "0x228ebBeE999c6a7ad74A6130E81b12f9Fe237Ba3"
   },
   {
     networkId: 83,
@@ -18,7 +18,7 @@ export const chains = [
     blockExplorer: "https://scan-warringstakes.meter.io",
     nativeTokenSymbol: "MTR",
     nativeTokenDecimals: 18,
-    contract: "0xf486c2D476762f09791C41A86Cfd73bd2cEcC1B2",
+    contract: "0x8eb76752dd045f8d135bccf966e252fed2a90fd3",
     mtrgAddr: "0x8A419Ef4941355476cf04933E90Bf3bbF2F73814"
   }
 ];
