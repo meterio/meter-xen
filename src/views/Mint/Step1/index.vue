@@ -2,6 +2,7 @@
   <v-card class="pa-4 mt-4">
     <v-card-title class="px-0">Claim Rank</v-card-title>
 
+    <v-alert v-if="error" type="error">{{ error }}</v-alert>
     <v-alert v-if="!!term" type="warning">This address has already minted MEN</v-alert>
 
     <v-sheet
@@ -90,7 +91,7 @@
   import { storeToRefs } from "pinia"
 
   const mintStore = useMintStore()
-  const { maxTerm, rank, term, mintLoading, maturityTs } = storeToRefs(mintStore)
+  const { maxTerm, rank, term, error, mintLoading, maturityTs } = storeToRefs(mintStore)
 
   const days = ref(0)
   const valid = ref(false)

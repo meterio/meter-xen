@@ -2,6 +2,8 @@ import { BigNumber } from "ethers";
 import { defineStore } from "pinia";
 import { useWalletStore } from "./wallet";
 import router from "@/router";
+import { v4 as uuidv4 } from 'uuid';
+import { useTxinfoStore } from "./txinfo";
 
 export const useStakeStore = defineStore({
   id: 'stake',
@@ -74,17 +76,33 @@ export const useStakeStore = defineStore({
       }
     },
     async stake(amount, term) {
+      const txinfoStore = useTxinfoStore()
+      const id = uuidv4()
       try {
         this.stakeLoading = true
 
         const { xenContract } = useWalletStore()
+        txinfoStore.updateTxinfos({
+          id: id,
+          hash: '',
+          title: 'Stake',
+          status: 'pending'
+        })
         const tx = await xenContract.stake(BigNumber.from(amount).mul((10 ** 18).toString()), term)
         await tx.wait()
+
+        txinfoStore.updateTxinfos({
+          id: id,
+          hash: tx.hash,
+          title: 'Stake',
+          status: 'over'
+        })
 
         this.stakeLoading = false
 
         await this.initData()
       } catch(e) {
+        txinfoStore.removeTxinfo({ id })
         this.stakeLoading = false
       }
     },
@@ -92,15 +110,35 @@ export const useStakeStore = defineStore({
       if (this.stakedAmount === 0) {
         return this.withdrawError = "No stake exists"
       }
+
+      const txinfoStore = useTxinfoStore()
+      const id = uuidv4()
+
       try {
         this.withdrawLoading = true
 
         const { xenContract } = useWalletStore()
+
+        txinfoStore.updateTxinfos({
+          id: id,
+          hash: '',
+          title: 'End Stake',
+          status: 'pending'
+        })
+
         const tx = await xenContract.withdraw()
         await tx.wait()
 
+        txinfoStore.updateTxinfos({
+          id: id,
+          hash: tx.hash,
+          title: 'End Stake',
+          status: 'over'
+        })
+
         this.withdrawLoading = false
       } catch(e) {
+        txinfoStore.removeTxinfo({ id })
         this.withdrawLoading = false
       }
     }

@@ -2,9 +2,10 @@ import { chains } from "@/constants/chains";
 import { defineStore } from "pinia";
 import { useWalletStore } from "./wallet";
 import { BigNumber, ethers } from "ethers";
+import { v4 as uuidv4 } from 'uuid';
 import xenABI from "@/constants/xenABI";
 import router from "@/router";
-import { zero_address } from "@/constants";
+import { useTxinfoStore } from "./txinfo";
 
 export const useMintStore = defineStore({
   id: 'mint',
@@ -20,6 +21,7 @@ export const useMintStore = defineStore({
     globalRank: 0,
     grossReward: 0,
     penalty: 0,
+    error: "",
     claimError: "",
     claimShareError: "",
     claimStakeError: "",
@@ -97,6 +99,9 @@ export const useMintStore = defineStore({
       }
     },
     async claimRank(term) {
+      const txinfoStore = useTxinfoStore()
+      const approveId = uuidv4()
+      const claimRankId = uuidv4()
       try {
         this.mintLoading = true
         console.log('term', term)
@@ -115,10 +120,41 @@ export const useMintStore = defineStore({
 
         const allowance = await mtrgContract.allowance(wallet.account, network.contract)
         if (BigNumber.from(allowance).lt(mintValue)) {
-          await (await mtrgContract.approve(network.contract, mintValue)).wait()
+          
+          txinfoStore.updateTxinfos({
+            id: approveId,
+            hash: '',
+            title: 'Approve MTRG',
+            status: 'pending'
+          })
+          const approveTx = await mtrgContract.approve(network.contract, mintValue)
+
+          await approveTx.wait()
+
+          txinfoStore.updateTxinfos({
+            id: approveId,
+            hash: approveTx.hash,
+            title: 'Approve MTRG',
+            status: 'over'
+          })
         }
+        
+        txinfoStore.updateTxinfos({
+          id: claimRankId,
+          hash: '',
+          title: 'Claim Rank',
+          status: 'pending'
+        })
         const tx = await xenContract.claimRank(term)
+        
         await tx.wait()
+
+        txinfoStore.updateTxinfos({
+          id: claimRankId,
+          hash: tx.hash,
+          title: 'Claim Rank',
+          status: 'over'
+        })
 
         this.mintLoading = false
   
@@ -128,6 +164,8 @@ export const useMintStore = defineStore({
         //   name: "MintStep2"
         // })
       } catch(e) {
+        txinfoStore.removeTxinfo({ id: approveId })
+        txinfoStore.removeTxinfo({ id: claimRankId })
         this.mintLoading = false
         console.log('claim rank error: ', e)
       }
@@ -137,15 +175,33 @@ export const useMintStore = defineStore({
         return this.claimError = "No MEN available to claim yet"
       }
       this.claimError = ""
+
+      const txinfoStore = useTxinfoStore()
+      const claimRewardId = uuidv4()
+
       try {
         this.claimRewardLoading = true
 
         const { xenContract } = useWalletStore()
+        txinfoStore.updateTxinfos({
+          id: claimRewardId,
+          hash: '',
+          title: 'Claim Reward',
+          status: 'pending'
+        })
         const tx = await xenContract.claimMintReward()
         await tx.wait()
 
+        txinfoStore.updateTxinfos({
+          id: claimRewardId,
+          hash: tx.hash,
+          title: 'Claim Reward',
+          status: 'over'
+        })
+
         this.claimRewardLoading = false
       } catch(e) {
+        txinfoStore.removeTxinfo({ id: claimRewardId })
         console.log(e)
         this.claimRewardLoading = false
       }
@@ -155,15 +211,33 @@ export const useMintStore = defineStore({
         return this.claimShareError = "No MEN available to claim yet"
       }
       this.claimShareError = ""
+
+      const txinfoStore = useTxinfoStore()
+      const claimRewardShareId = uuidv4()
+
       try {
         this.claimRewardAndShareLoading = true
 
         const { xenContract } = useWalletStore()
+        txinfoStore.updateTxinfos({
+          id: claimRewardShareId,
+          hash: '',
+          title: 'Claim Reward & Share',
+          status: 'pending'
+        })
         const tx = await xenContract.claimMintRewardAndShare(address, pct)
         await tx.wait()
 
+        txinfoStore.updateTxinfos({
+          id: claimRewardShareId,
+          hash: tx.hash,
+          title: 'Claim Reward & Share',
+          status: 'over'
+        })
+
         this.claimRewardAndShareLoading = false
       } catch (e) {
+        txinfoStore.removeTxinfo({ id: claimRewardShareId })
         this.claimRewardAndShareLoading = false
       }
     },
@@ -172,15 +246,35 @@ export const useMintStore = defineStore({
         return this.claimStakeError = "No MEN available to claim yet"
       }
       this.claimStakeError = ""
+
+      const txinfoStore = useTxinfoStore()
+      const claimRewardStakeId = uuidv4()
+
       try {
         this.claimRewardAndStakeLoading = true
 
         const { xenContract } = useWalletStore()
+
+        txinfoStore.updateTxinfos({
+          id: claimRewardStakeId,
+          hash: '',
+          title: 'Claim Reward & Stake',
+          status: 'pending'
+        })
+
         const tx = await xenContract.claimMintRewardAndStake(pct, term)
         await tx.wait()
 
+        txinfoStore.updateTxinfos({
+          id: claimRewardStakeId,
+          hash: tx.hash,
+          title: 'Claim Reward & Stake',
+          status: 'over'
+        })
+
         this.claimRewardAndStakeLoading = false
       } catch (e) {
+        txinfoStore.removeTxinfo({ id: claimRewardStakeId })
         this.claimRewardAndStakeLoading = false
       }
     }
