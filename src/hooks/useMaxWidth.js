@@ -6,7 +6,7 @@ export default () => {
 
   let maxWidth = computed(() => {
     if (!mobile.value) {
-      return 500
+      return 450
     } else {
       return null
     }

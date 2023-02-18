@@ -17,4 +17,12 @@ const app = createApp(App)
 
 registerPlugins(app)
 
+import MInput from '@/components/MInput'
+import MPanel from '@/components/MPanel'
+import MAlert from '@/components/MAlert'
+
+app.component('m-input', MInput)
+app.component('m-panel', MPanel)
+app.component('m-alert', MAlert)
+
 app.mount('#app')

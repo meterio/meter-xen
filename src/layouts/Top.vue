@@ -1,74 +1,82 @@
 <template>
   <v-app-bar
-      class="px-3"
+      class="px-3 border-bottom-black-color"
       color="white"
       flat
-      density="compact"
     >
-      <v-avatar
-        size="32"
-      >
-        <v-img src="/meter.png"></v-img>
-      </v-avatar>
-
-      <v-spacer></v-spacer>
-
-      <v-tabs
-        centered
-        color="grey-darken-2"
-        :model-value="linkValue"
-        @update:modelValue="listenLinkValue"
-      >
-        <v-tab
-          v-for="link in links"
-          :key="link"
-        >
-          {{ link }}
-        </v-tab>
-      </v-tabs>
-      <v-spacer></v-spacer>
-      <section v-if="!mobile">
-        <v-menu>
-          <template v-slot:activator="{ props }">
-            <v-chip v-if="wallet.networkName" v-bind="props" link>{{ wallet.networkName }}</v-chip>
-          </template>
-          <v-card class="menu-container d-flex flex-column">
-            <v-chip
-              v-for="item in chains"
-              :key="item.networkId"
-              @click="setChain(item.networkId)"
-              class="ma-1"
-              link="">{{ item.name }}</v-chip>
-          </v-card>
-        </v-menu>
-        <v-chip class="ml-2" @click="connect">
-          <div v-if="shortAccount" class="d-flex">
-            <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
-            <span>{{ shortAccount }}</span>
+      <v-row>
+        <v-col>
+          <div class="d-flex align-center fill-height">
+            <h4>MeterMen</h4>
           </div>
-          <div v-else>No Wallet Connected</div>
-        </v-chip>
-      </section>
-      <v-menu v-else>
-        <template v-slot:activator="{ props }">
-          <v-btn
-            color="primary"
-            v-bind="props"
-            icon="mdi-dots-vertical"
-          >
-          </v-btn>
-        </template>
-        <v-card class="menu-container d-flex flex-column">
-          <v-chip class="ma-1" v-if="wallet.networkName">{{ wallet.networkName }}</v-chip>
-          <v-chip class="ma-1" @click="connect">
-            <div v-if="shortAccount" class="d-flex">
-              <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
-              <span>{{ shortAccount }}</span>
-            </div>
-            <div v-else>No Wallet Connected</div>
-          </v-chip>
-        </v-card>
-      </v-menu>
+        </v-col>
+        <v-col>
+          <div class="d-flex justify-center align-center fill-height">
+            <v-btn
+              rounded="pill"
+              color="my-color"
+              :active="mintBtnActive"
+              @click="goMint"
+            >
+              Mint
+            </v-btn>
+            <v-btn
+              rounded="pill"
+              color="my-color ml-4"
+              :active="stakeBtnActive"
+              @click="goStake"
+            >
+              Stake
+            </v-btn>
+          </div>
+        </v-col>
+        <v-col>
+          <div class="d-flex justify-end align-center">
+            <section v-if="!mobile">
+              <v-menu>
+                <template v-slot:activator="{ props }">
+                  <v-chip v-if="wallet.networkName" v-bind="props" link>{{ wallet.networkName }}</v-chip>
+                </template>
+                <v-card class="menu-container d-flex flex-column">
+                  <v-chip
+                    v-for="item in chains"
+                    :key="item.networkId"
+                    @click="setChain(item.networkId)"
+                    class="ma-1"
+                    link="">{{ item.name }}</v-chip>
+                </v-card>
+              </v-menu>
+              <v-chip link color="myConnectWalletColor" class="ml-2" @click="connect">
+                <div v-if="shortAccount" class="d-flex">
+                  <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
+                  <span>{{ shortAccount }}</span>
+                </div>
+                <div v-else>Connect wallet</div>
+              </v-chip>
+            </section>
+            <v-menu v-else>
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  color="primary"
+                  v-bind="props"
+                  icon="mdi-dots-vertical"
+                >
+                </v-btn>
+              </template>
+              <v-card class="menu-container d-flex flex-column">
+                <v-chip class="ma-1" v-if="wallet.networkName">{{ wallet.networkName }}</v-chip>
+                <v-chip link class="ma-1" @click="connect">
+                  <div v-if="shortAccount" class="d-flex">
+                    <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
+                    <span>{{ shortAccount }}</span>
+                  </div>
+                  <div v-else>Connect wallet</div>
+                </v-chip>
+              </v-card>
+            </v-menu>
+          </div>
+        </v-col>
+      </v-row>
     </v-app-bar>
 </template>
 
@@ -77,7 +85,7 @@
   import { useStakeStore } from '@/store/stake'
   import { useWalletStore } from '@/store/wallet'
   import { storeToRefs } from 'pinia'
-  import { computed, inject, ref } from 'vue'
+  import { computed, inject, ref, watch, watchEffect } from 'vue'
   import { useRoute, useRouter } from "vue-router"
   import { useDisplay } from 'vuetify'
   import { chains } from '@/constants/chains'
@@ -104,6 +112,43 @@
   } else if (route.path.includes('stake')) {
     linkValue.value = 1
   }
+
+  // --------------------------------------------
+  const mintBtnActive = ref(false)
+  const stakeBtnActive = ref(false)
+
+  if (route.path.includes('mint')) {
+    mintBtnActive.value = true
+  }
+
+  if (route.path.includes('stake')) {
+    stakeBtnActive.value = true
+  }
+
+  watchEffect(() => {
+    if (mintBtnActive.value) {
+      stakeBtnActive.value = false
+    }
+  })
+  watchEffect(() => {
+    if (stakeBtnActive.value) {
+      mintBtnActive.value = false
+    }
+  })
+
+  const goMint = () => {
+    mintBtnActive.value = true
+    router.push({
+      name: 'MintStep1'
+    })
+  }
+  const goStake = () => {
+    stakeBtnActive.value = true
+    router.push({
+      name: 'StakeStep1'
+    })
+  }
+  // --------------------------------------------
 
   const listenLinkValue = (link) => {
     linkValue.value = link

@@ -1,112 +1,95 @@
 <template>
-  <v-card class="pa-4 mt-4">
-    <v-card-title class="px-0">Claim Rank</v-card-title>
+  <div class="page-container">
+    <v-card class="pa-4 mt-4 white-bg main-content" variant="outlined" rounded="xl">
+      <v-card-title class="d-flex justify-center">Claim Rank</v-card-title>
 
-    <v-alert v-if="error" type="error">{{ error }}</v-alert>
-    <v-alert v-if="!!term" type="warning">This address has already minted MEN</v-alert>
+      <m-alert :type="alertInfo.type" :msg="alertInfo.msg"></m-alert>
+      <!-- <v-alert closable v-if="!!term" type="warning">This address has already minted MEN</v-alert> -->
 
-    <v-sheet
-      rounded
-      color="grey-lighten-3"
-      class="mx-auto w-100 pa-2"
-    >
-      <v-form
-        ref="formRef"
-        v-model="valid"
-        lazy-validation
+      <v-sheet
+        rounded
+        class="mx-auto w-100 pa-2"
       >
-        <v-text-field
-          v-model="days"
-          :rules="daysRules"
-          label="days"
-          required
-        ></v-text-field>
-      </v-form>
+        <section class="text-body-2 text-center">Number of days</section>
 
-      <section class="d-flex justify-space-between">
-        <span class="text-body-2">Number of days</span>
-        <v-btn variant="tonal" size="sm" @click="maxDays">
-          Max
-        </v-btn>
+        <section class="text-center">
+          <m-input v-model="days" :max="maxTerm" />
+        </section>
+      </v-sheet>
+
+      <section class="mt-6">
+        <m-panel :data="panelData"></m-panel>
       </section>
-    </v-sheet>
 
-    <v-row>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2 "
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Your Claim Rank</span>
-            <span class="text-body-2">{{ rank }}</span>
-          </div>
-        </v-sheet>
-      </v-col>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2"
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Maturity</span>
-            <span class="text-body-2">{{ days }} Days</span>
-          </div>
-        </v-sheet>
-      </v-col>
-    </v-row>
+      <v-sheet
+        rounded
+        class="mx-auto w-100 mt-4 pa-4"
+      >
+        <span class="text-caption">Your mint starts by claiming a rank. Select the number of days you want to mint for. The longer you mint for, the more rewards you will receive. You can mint for a maximum of 100 days.</span>
+      </v-sheet>
 
-    <v-sheet
-      rounded
-      color="grey-lighten-3"
-      class="mx-auto w-100 mt-4 pa-2"
-    >
-      <div class="d-flex flex-column justify-space-between fill-height">
-        <span class="text-subtitle-2">Minting Terms</span>
-        <span class="text-body-2">Your mint starts by claiming a rank. Select the number of days you want to mint for. The longer you mint for, the more rewards you will receive. You can mint for a maximum of 100 days.</span>
-      </div>
-    </v-sheet>
-
-    <v-btn
-      block
-      size="large"
-      class="mt-4"
-      color="primary"
-      @click="mint"
-      :loading="mintLoading"
-      :disabled="!!term"
-    >
-      START MINT
-    </v-btn>
-  </v-card>
+      <v-btn
+        block
+        size="large"
+        class="my-4"
+        color="primary"
+        @click="mint"
+        :loading="mintLoading"
+        :disabled="!!term"
+        rounded="pill"
+      >
+        Mint
+      </v-btn>
+    </v-card>
+    <v-card class="pa-4 mx-5 white-bg next-page" variant="outlined" rounded="xl"></v-card>
+  </div>
 </template>
 
 <script setup>
-  import { ref, watch } from "vue"
+  import { computed, reactive, ref, watch, watchEffect } from "vue"
   import { useMintStore } from "@/store/mint"
   import { storeToRefs } from "pinia"
+  import { validate } from "@/utils"
 
   const mintStore = useMintStore()
   const { maxTerm, rank, term, error, mintLoading, maturityTs } = storeToRefs(mintStore)
 
-  const days = ref(0)
-  const valid = ref(false)
+  let alertInfo = reactive({
+    type: '',
+    msg: ''
+  })
 
-  const daysRules = [
-    v => !!v || 'days is required',
-    v => (v && !isNaN(Number(v))) || 'days must be a number',
-    v => (Number(v) > 0) || 'days must great than 0'
-  ];
+  watchEffect(() => {
+    if (!!error.value) {
+      alertInfo.type = 'error'
+      alertInfo.msg = error
+    }
+    if (!!term.value) {
+      alertInfo.type = 'warning'
+      alertInfo.msg = 'This address has already minted MEN'
+    }
+  })
+
+  const days = ref(0)
+
+  const panelData = computed(() => {
+    return [
+      {
+        title: 'Claim rank',
+        value: rank.value,
+        name: ''
+      },
+      {
+        title: 'Maturity',
+        value: days.value,
+        name: 'days'
+      }
+    ]
+  })
 
   const maxDays = () => {
     days.value = maxTerm.value
   }
-
-  const formRef = ref(null)
 
   watch(maturityTs, (ts) => {
     if (ts > 0) {
@@ -117,15 +100,37 @@
     }
   }, {immediate: true})
 
+  const daysRules = [
+    v => !!v || 'days is required',
+    v => (v && !isNaN(Number(v))) || 'days must be a number',
+    v => (Number(v) > 0) || 'days must great than 0'
+  ];
+
   const mint = async () => {
-    const { valid } = await formRef.value.validate()
-    console.log('valid', valid)
-    if (valid) {
+    const valid = validate(daysRules, days.value)
+
+    if (!valid.status) {
+      alertInfo.type = 'warning'
+      alertInfo.msg = valid.msg
+    } else {
+      alertInfo.msg = ''
       mintStore.claimRank(days.value)
     }
   }
 </script>
 
 <style scoped>
-
+  .page-container {
+    position: relative;
+    z-index: 2;
+  }
+  .main-content {
+    position: relative;
+    z-index: 2;
+  }
+  .next-page {
+    position: relative;
+    bottom: 18px;
+    z-index: 1;
+  }
 </style>

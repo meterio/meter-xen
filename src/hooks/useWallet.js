@@ -38,9 +38,9 @@ export default () => {
         }
       },
       appMetadata: {
-        name: 'Meter XEN',
+        name: 'Meter MEN',
         icon: '<svg></svg>',
-        description: 'Meter XEN'
+        description: 'Meter MEN'
       }
     })
 
