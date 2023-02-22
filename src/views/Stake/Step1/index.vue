@@ -1,155 +1,134 @@
 <template>
-  <v-card class="pa-4 mt-4">
+  <v-card class="pa-4 my-4 white-bg" :class="{'mx-1': !mobile}">
     <v-card-title class="px-0">Start Stake</v-card-title>
 
-    <v-alert v-if="!!term" type="warning">This address has already staked MEN</v-alert>
+    <m-alert :type="alertInfo.type" :msg="alertInfo.msg"></m-alert>
 
-    <v-sheet
-      rounded
-      color="grey-lighten-3"
-      class="mx-auto w-100 pa-2"
-    >
-      <v-form
-        ref="amountRef"
-        v-model="amountValid"
-        lazy-validation
+    <section class="mt-5">
+      <div class="my-text-color">Enter Stake Amount</div>
+      <v-sheet
+        rounded
+        class="mx-auto w-100 pa-2 mt-1"
+        color="#ededed"
       >
-        <v-text-field
-          v-model="stakeAmount"
-          :rules="amountRules"
-          label="amount"
-          required
-        ></v-text-field>
-      </v-form>
 
-      <section class="d-flex justify-space-between">
-        <span class="text-body-2">Maximum stake amount</span>
-        <v-btn variant="tonal" size="sm" @click="maxAmount">
-          Max
-        </v-btn>
-      </section>
-    </v-sheet>
+        <m-input v-model="stakeAmount" :max="amount" />
+      </v-sheet>
+    </section>
 
     <!-- maximum stake days -->
-    <v-sheet
-      rounded
-      color="grey-lighten-3"
-      class="mx-auto w-100 pa-2 mt-4"
-    >
-      <v-form
-        ref="daysRef"
-        v-model="daysValid"
-        lazy-validation
+    <section class="mt-5">
+      <div class="my-text-color">Enter Stake Days</div>
+      <v-sheet
+        rounded
+        class="mx-auto w-100 pa-2 mt-1"
+        color="#ededed"
       >
-        <v-text-field
-          v-model="days"
-          :rules="daysRules"
-          label="days"
-          required
-        ></v-text-field>
-      </v-form>
 
-      <section class="d-flex justify-space-between">
-        <span class="text-body-2">Maximum stake days</span>
-        <v-btn variant="tonal" size="sm" @click="maxDays">
-          Max
-        </v-btn>
-      </section>
-    </v-sheet>
-
-    <v-row>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2 "
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Yield</span>
-            <span class="text-body-2">{{ currentAPY }}%</span>
-          </div>
-        </v-sheet>
-      </v-col>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2"
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Maturity</span>
-            <span class="text-body-2">{{ days }} Days</span>
-          </div>
-        </v-sheet>
-      </v-col>
-    </v-row>
+        <m-input v-model="days" :max="maxTerm" />
+      </v-sheet>
+    </section>
+    
+    <section class="mt-6">
+      <m-panel :data="panelData"></m-panel>
+    </section>
 
     <v-sheet
       rounded
-      color="grey-lighten-3"
-      class="mx-auto w-100 mt-4 pa-2"
+      class="mx-auto w-100 mt-4"
     >
-      <div class="d-flex flex-column justify-space-between fill-height">
-        <span class="text-subtitle-2">Staking Terms</span>
-        <span class="text-body-2">Withdraw original stake amount plus yield at any time after the maturity date, or at any time the original stake amount with 0 (zero) yield before the maturity date. One stake at a time per one address</span>
-      </div>
+      <span class="text-caption">Withdraw original stake amount plus yield at any time after the maturity date, or at any time the original stake amount with 0 (zero) yield before the maturity date. One stake at a time per one address</span>
     </v-sheet>
 
     <v-btn
       block
       size="large"
-      class="mt-4"
-      color="primary"
+      class="my-4"
+      color="#5CE199"
       @click="startStake"
       :loading="stakeLoading"
       :disabled="!!term"
+      rounded="pill"
     >
-      START STAKE
+      Start Stake
     </v-btn>
   </v-card>
 </template>
 
 <script setup>
-  import { computed, ref } from "vue";
+  import { computed, ref, reactive, watchEffect } from "vue";
   import { useStakeStore } from "@/store/stake"
   import { storeToRefs } from "pinia";
+  import { useDisplay } from 'vuetify'
+
+  const { mobile } = useDisplay()
 
   const stakeStore = useStakeStore()
   const { maxTerm, amount, currentAPY, stakeLoading, stakeError, term } = storeToRefs(stakeStore)
 
-  const amountRef = ref(null)
+  let alertInfo = reactive({
+    type: '',
+    msg: ''
+  })
+
+  watchEffect(() => {
+    if (!!stakeError.value) {
+      alertInfo.type = 'error'
+      alertInfo.msg = stakeError
+    }
+    if (!!term.value) {
+      alertInfo.type = 'warning'
+      alertInfo.msg = 'This address has already staked MEN'
+    }
+  })
+  
   const stakeAmount = ref(0)
-  const amountValid = ref(false)
   const amountRules = [
     v => !!v || 'amount is required',
     v => (v && !isNaN(Number(v))) || 'amount must be a number',
     v => (Number(v) > 0) || 'amount must great than 0',
     v => (Number(v) <= amount.value) || 'insufficient balance'
   ]
-  const maxAmount = () => {
-    stakeAmount.value = amount.value
-  }
-
-  const daysRef = ref(null)
-  const daysValid = ref(false)
   const days = ref(0)
   const daysRules = [
     v => !!v || 'days is required',
     v => (v && !isNaN(Number(v))) || 'days must be a number',
     v => (Number(v) > 0) || 'days must great than 0'
   ];
-  const maxDays = () => {
-    days.value = maxTerm.value
-  }
+
+  const panelData = computed(() => {
+    return [
+      {
+        title: 'Yield',
+        value: currentAPY.value + "%",
+        name: '',
+        tip: ''
+      },
+      {
+        title: 'Maturity',
+        value: days.value,
+        name: 'days',
+        tip: ''
+      }
+    ]
+  })
 
   const startStake = async () => {
-    await amountRef.value.validate()
-    await daysRef.value.validate()
+    const amountValid = mValidate(amountRules, stakeAmount.value)
+    const daysValid = mValidate(daysRules, days.value)
 
-    if (amountValid.value && daysValid.value) {
-      stakeStore.stake(stakeAmount.value, days.value)
+    if (!amountValid.status) {
+      alertInfo.type = 'warning'
+      alertInfo.msg = amountValid.msg
+      return
     }
+    if (!daysValid.status) {
+      alertInfo.type = 'warning'
+      alertInfo.msg = daysValid.msg
+      return
+    }
+    alertInfo.msg = ''
+
+    stakeStore.stake(stakeAmount.value, days.value)
   }
 </script>

@@ -1,109 +1,74 @@
 <template>
-  <v-card class="pa-4 mt-4">
+  <v-card class="pa-4 my-4 white-bg" :class="{'mx-1': !mobile}">
     <v-card-title class="px-0">Claim Mint + Stake</v-card-title>
 
-    <v-alert v-if="claimStakeError" type="error">{{ claimStakeError }}</v-alert>
+    <m-alert :type="alertInfo.type" :msg="alertInfo.msg"></m-alert>
 
-    <v-row>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2 "
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Reward</span>
-            <span class="text-body-2">{{ reward }}</span>
-          </div>
-        </v-sheet>
-      </v-col>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2"
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Penalty</span>
-            <span class="text-body-2">{{ penalty }}%</span>
-          </div>
-        </v-sheet>
-      </v-col>
-    </v-row>
+    <section class="mt-6">
+      <m-panel :data="panelData"></m-panel>
+    </section>
 
-    <v-sheet
-      rounded
-      color="grey-lighten-3"
-      class="mx-auto w-100 mt-4 pa-2"
-    >
-      <v-form
-        ref="percentageRef"
-        v-model="percentageValid"
-        lazy-validation
+    <section class="mt-5">
+      <div class="my-text-color">Stake Percentage</div>
+      <v-sheet
+        rounded
+        class="mx-auto w-100 pa-2 mt-1"
+        color="#ededed"
       >
-        <v-text-field
-          v-model="percentage"
-          :rules="percentageRules"
-          label="Percentage"
-          required
-        ></v-text-field>
-      </v-form>
-      <div class="d-flex justify-space-between">
-        <span class="text-body-2">Stake Percentage</span>
-        <v-btn variant="tonal" size="sm" @click="maxStakePercentage">
-          Max
-        </v-btn>
-      </div>
-    </v-sheet>
 
-    <v-sheet
-      rounded
-      color="grey-lighten-3"
-      class="mx-auto w-100 mt-4 pa-2"
-    >
-      <v-form
-        ref="stakeDaysRef"
-        v-model="daysValid"
-        lazy-validation
+        <m-input v-model="percentage" :max="100" />
+      </v-sheet>
+    </section>
+
+    <section class="mt-5">
+      <div class="my-text-color">Stake Days</div>
+      <v-sheet
+        rounded
+        class="mx-auto w-100 pa-2 mt-1"
+        color="#ededed"
       >
-        <v-text-field
-          v-model="days"
-          :rules="daysRules"
-          label="days"
-          required
-        ></v-text-field>
-      </v-form>
-      <div class="d-flex justify-space-between">
-        <span class="text-body-2">Stake Days</span>
-        <v-btn variant="tonal" size="sm" @click="maxStakeDays">
-          Max
-        </v-btn>
-      </div>
-    </v-sheet>
+
+        <m-input v-model="days" :max="1000" />
+      </v-sheet>
+    </section>
 
     <v-btn
       block
       size="large"
       class="mt-4"
-      color="primary"
+      color="#5CE199"
       @click="mintStake"
       :loading="loading"
+      rounded="pill"
     >
-    CLAIM MINT + STAKE
+    Claim Mint + Stake
     </v-btn>
   </v-card>
 </template>
 
 <script setup>
   import { useMintStore } from "@/store/mint";
-  import { ref, toRefs } from "vue";
+  import { ref, toRefs, computed, watchEffect, reactive } from "vue";
   import { storeToRefs } from "pinia";
+  import { useDisplay } from 'vuetify'
+
+  const { mobile } = useDisplay()
 
   const mintStore = useMintStore()
 
   const { claimStakeError } = storeToRefs(mintStore)
+
+  let alertInfo = reactive({
+    type: '',
+    msg: ''
+  })
+
+  watchEffect(() => {
+    if (!!claimStakeError.value) {
+      alertInfo.type = 'error'
+      alertInfo.msg = claimStakeError
+    }
+  })
 
   const props = defineProps({
     reward: Number,
@@ -111,22 +76,33 @@
     loading: Boolean
   })
 
-  const { reward } = toRefs(props)
+  const { reward, penalty } = toRefs(props)
 
-  const percentageValid = ref(false)
+  const panelData = computed(() => {
+    return [
+      {
+        title: 'Reward',
+        value: reward,
+        name: '',
+        tip: ''
+      },
+      {
+        title: 'Penalty',
+        value: penalty.value + "%",
+        name: '',
+        tip: ''
+      }
+    ]
+  })
+
   const percentage = ref(0)
-  const percentageRef = ref(null)
   const percentageRules = [
     v => !!v || 'percentage is required',
     v => (v && !isNaN(Number(v))) || 'percentage must be a number',
     v => (Number(v) > 0) || 'percentage must great than 0',
     v => (Number(v) <= 100) || 'percentage must less than or equal 100'
   ]
-  const maxStakePercentage = () => {
-    percentage.value = 100
-  }
 
-  const daysValid = ref(false)
   const days = ref(0)
   const daysRules = [
     v => !!v || 'days is required',
@@ -134,16 +110,22 @@
     v => (Number(v) > 0) || 'days must great than 0',
     v => (Number(v) <= 1000) || 'days must less than or equal 1000'
   ]
-  const stakeDaysRef = ref(null)
-  const maxStakeDays = () => {
-    days.value = 1000
-  }
 
   const mintStake = async () => {
-    await percentageRef.value.validate()
-    await stakeDaysRef.value.validate()
-    if (percentageValid.value && daysValid.value) {
-      mintStore.claimMintRewardAndStake(percentage.value, days.value)
+    const perValid = mValidate(percentageRules, percentage.value)
+    const daysValid = mValidate(daysRules, days.value)
+
+    if (!perValid.status) {
+      alertInfo.type = 'warning'
+      alertInfo.msg = perValid.msg
+      return
     }
+    if (!daysValid.status) {
+      alertInfo.type = 'warning'
+      alertInfo.msg = daysValid.msg
+      return
+    }
+    alertInfo.msg = ''
+    mintStore.claimMintRewardAndStake(percentage.value, days.value)
   }
 </script>

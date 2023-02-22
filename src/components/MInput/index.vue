@@ -1,30 +1,45 @@
 <template>
-  <div class="m-input-container">
-    <input
-      class="my-input text-center"
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-    />
-    <span class="suffix-name">
-      <slot>days</slot>
-    </span>
-  </div>
-  <div>
-    <v-btn
-      rounded="pill"
-      variant="outlined"
-      @click="max"
-    >
-      Max
-    </v-btn>
+  <div class="d-flex">
+    <div class="m-input-container w-100">
+      <input
+        class="w-100"
+        :style="computedMyInput"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+      />
+    </div>
+    <div v-if="isMax" class="d-flex align-end">
+      <v-btn
+        rounded="pill"
+        variant="text"
+        @click="max"
+      >
+        <span class="my-text-color">Max</span>
+      </v-btn>
+    </div>
   </div>
 </template>
 
 <script setup>
   import { validate } from "@/utils"
-  const props = defineProps(['modelValue', 'max'])
+  import { computed } from "vue"
+  const props = defineProps(['modelValue', 'max', 'plain'])
   const emits = defineEmits(['update:modelValue'])
 
+  const computedMyInput = computed(() => {
+    if (!!!props.plain) {
+      return {
+        height: '60px',
+        fontWeight: 'bold',
+        fontSize: '50px'
+      }
+    }
+    return {
+      height: '40px'
+    }
+  })
+
+  const isMax = computed(() => props.max !== undefined)
   const max = () => {
     emits('update:modelValue', props.max)
   }
@@ -34,16 +49,7 @@
   .m-input-container {
     position: relative;
   }
-  .my-input {
-    font-weight: bold;
-    font-size: 60px;
-    width: 120px;
-  }
-  .my-input:focus {
+  input:focus {
     outline: none !important;
-  }
-  .suffix-name {
-    position: absolute;
-    bottom: 20px;
   }
 </style>

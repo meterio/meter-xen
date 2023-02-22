@@ -14,14 +14,22 @@
 
 <style>
   .global-bg-color {
-    background-color: #fafafa;
+    background-color: #f9f9f9;
   }
   .v-btn {
     text-transform: none !important;
   }
   .text-my-color.v-btn--active {
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: #5CE199;
+  }
+  .bg-my-color {
+    background-color: #0a2d1a !important;
+    color: white !important;
+  }
+  .bg-my-color.v-btn--active {
+    background-color: white !important;
+    color: #5CE199 !important;
   }
   .text-myConnectWalletColor {
     background-color: #5ce199 !important;
@@ -34,5 +42,11 @@
   }
   .white-bg {
     background-color: white !important;
+  }
+  .white-text {
+    color: white !important;
+  }
+  .my-text-color {
+    color: #808080;
   }
 </style>

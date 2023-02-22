@@ -25,4 +25,8 @@ app.component('m-input', MInput)
 app.component('m-panel', MPanel)
 app.component('m-alert', MAlert)
 
+import { validate } from "@/utils"
+
+window.mValidate = validate
+
 app.mount('#app')

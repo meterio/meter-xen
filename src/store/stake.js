@@ -22,6 +22,7 @@ export const useStakeStore = defineStore({
     stakeLoading: false,
     withdrawLoading: false,
 
+    stakeError: "",
     withdrawError: "",
   }),
   getters: {},
@@ -102,6 +103,11 @@ export const useStakeStore = defineStore({
 
         await this.initData()
       } catch(e) {
+        if (e.message.includes('user rejected transaction')) {
+          this.stakeError = "User denied transaction signature."
+        } else {
+          this.stakeError = e.message
+        }
         txinfoStore.removeTxinfo({ id })
         this.stakeLoading = false
       }

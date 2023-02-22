@@ -4,19 +4,21 @@
       :max-width="maxWidth"
       class="fill-height">
 
-      <v-row justify="space-between" class="text-center">
-        <v-col>
-          <v-btn icon :color="currentStep === 1 ? 'primary' : ''" @click="clickStep1">1</v-btn>
-        </v-col>
+      <div class="px-2">
+        <v-row class="text-center">
+          <v-col>
+            <v-btn :variant="currentStep === 1 ? 'tonal' : 'text'" rounded="pill" @click="clickStep1">Start Stake</v-btn>
+          </v-col>
 
-        <v-col>
-          <v-btn icon :color="currentStep === 2 ? 'primary' : ''" @click="clickStep2">2</v-btn>
-        </v-col>
+          <v-col>
+            <v-btn :variant="currentStep === 2 ? 'tonal' : 'text'" rounded="pill" @click="clickStep2">Staking</v-btn>
+          </v-col>
 
-        <v-col>
-          <v-btn icon :color="currentStep === 3 ? 'primary' : ''" @click="clickStep3">3</v-btn>
-        </v-col>
-      </v-row>
+          <v-col>
+            <v-btn :variant="currentStep === 3 ? 'tonal' : 'text'" rounded="pill" @click="clickStep3">End Stake</v-btn>
+          </v-col>
+        </v-row>
+      </div>
 
       <router-view />
 

@@ -1,83 +1,99 @@
 <template>
-  <v-app-bar
-      class="px-3 border-bottom-black-color"
-      color="white"
-      flat
-    >
-      <v-row>
-        <v-col>
-          <div class="d-flex align-center fill-height">
-            <h4>MeterMen</h4>
-          </div>
-        </v-col>
-        <v-col>
-          <div class="d-flex justify-center align-center fill-height">
-            <v-btn
-              rounded="pill"
-              color="my-color"
-              :active="mintBtnActive"
-              @click="goMint"
-            >
-              Mint
-            </v-btn>
-            <v-btn
-              rounded="pill"
-              color="my-color ml-4"
-              :active="stakeBtnActive"
-              @click="goStake"
-            >
-              Stake
-            </v-btn>
-          </div>
-        </v-col>
-        <v-col>
-          <div class="d-flex justify-end align-center">
-            <section v-if="!mobile">
-              <v-menu>
-                <template v-slot:activator="{ props }">
-                  <v-chip v-if="wallet.networkName" v-bind="props" link>{{ wallet.networkName }}</v-chip>
-                </template>
-                <v-card class="menu-container d-flex flex-column">
-                  <v-chip
-                    v-for="item in chains"
-                    :key="item.networkId"
-                    @click="setChain(item.networkId)"
-                    class="ma-1"
-                    link="">{{ item.name }}</v-chip>
-                </v-card>
-              </v-menu>
-              <v-chip link color="myConnectWalletColor" class="ml-2" @click="connect">
-                <div v-if="shortAccount" class="d-flex">
-                  <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
-                  <span>{{ shortAccount }}</span>
-                </div>
-                <div v-else>Connect wallet</div>
-              </v-chip>
-            </section>
-            <v-menu v-else>
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  color="primary"
-                  v-bind="props"
-                  icon="mdi-dots-vertical"
-                >
-                </v-btn>
-              </template>
-              <v-card class="menu-container d-flex flex-column">
-                <v-chip class="ma-1" v-if="wallet.networkName">{{ wallet.networkName }}</v-chip>
-                <v-chip link class="ma-1" @click="connect">
-                  <div v-if="shortAccount" class="d-flex">
-                    <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
-                    <span>{{ shortAccount }}</span>
+    <div class="d-flex justify-center global-bg-color">
+      <v-card
+        :min-width="mobile ? '100%' : '600'"
+        class="my-5 pa-2"
+        rounded="pill"
+        elevation="0"
+        color="#0a2d1a">
+        <v-row>
+          <v-col>
+            <div class="d-flex align-center fill-height white-text">
+              <!-- <h4>MeterMen</h4> -->
+              <v-img
+                :width="50"
+                :height="40"
+                src="/logo.svg"
+              ></v-img>
+            </div>
+          </v-col>
+          <v-col>
+            <div class="d-flex justify-center align-center fill-height">
+              <v-btn
+                rounded="pill"
+                color="my-color"
+                :active="mintBtnActive"
+                @click="goMint"
+                elevation="0"
+              >
+                Mint
+              </v-btn>
+              <v-btn
+                rounded="pill"
+                color="my-color ml-4"
+                :active="stakeBtnActive"
+                @click="goStake"
+                elevation="0"
+              >
+                Stake
+              </v-btn>
+            </div>
+          </v-col>
+          <v-col>
+            <div class="d-flex justify-end align-center fill-height">
+              <section v-if="!mobile">
+                <v-menu  v-if="!isSupport">
+                  <template v-slot:activator="{ props }">
+                    <v-chip color="white" v-if="wallet.networkName" v-bind="props" link>
+                      {{ wallet.networkName }}
+                      <v-icon icon="mdi-chevron-down"></v-icon>
+                    </v-chip>
+                  </template>
+                  <v-card class="menu-container d-flex flex-column">
+                    <v-chip
+                      v-for="item in chains"
+                      :key="item.networkId"
+                      @click="setChain(item.networkId)"
+                      class="ma-1"
+                      link="">{{ item.name }}</v-chip>
+                  </v-card>
+                </v-menu>
+                <v-chip v-else link color="myConnectWalletColor" class="ml-2" @click="connect">
+                  <div v-if="shortAccount">
+                    <section class="d-flex align-center">
+                      <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
+                      <span>{{ shortAccount }}</span>
+                    </section>
                   </div>
                   <div v-else>Connect wallet</div>
                 </v-chip>
-              </v-card>
-            </v-menu>
-          </div>
-        </v-col>
-      </v-row>
-    </v-app-bar>
+              </section>
+              <v-menu v-else>
+                <template v-slot:activator="{ props }">
+                  <v-btn
+                    color="white"
+                    v-bind="props"
+                    icon="mdi-dots-vertical"
+                    variant="plain"
+                  >
+                  </v-btn>
+                </template>
+                <v-card class="menu-container d-flex flex-column">
+                  <v-chip class="ma-1" v-if="wallet.networkName">{{ wallet.networkName }}</v-chip>
+                  <v-chip link class="ma-1" @click="connect">
+                    <div v-if="shortAccount" class="d-flex">
+                      <span class="wallet-icon d-flex align-center" v-html="wallet.icon"></span>
+                      <span>{{ shortAccount }}</span>
+                    </div>
+                    <div v-else>Connect wallet</div>
+                  </v-chip>
+                </v-card>
+              </v-menu>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card>
+    </div>
 </template>
 
 <script setup>
@@ -170,8 +186,12 @@
     }
   }
 
+  const isSupport = computed(() => {
+    const chain = chains.find(c => c.networkId === wallet.value.networkId)
+    return !!chain
+  })
+
   const shortAccount = computed(() => {
-    // console.log('wallet', wallet)
     if (wallet.value.account) {
       const account = wallet.value.account
       const short = `${account.substring(0, 6)}...${account.substring(account.length - 4, account.length)}`
@@ -192,5 +212,8 @@
   }
   .menu-container {
     background-color: #fff;
+  }
+  :deep .v-img__img {
+    width: auto !important;
   }
 </style>

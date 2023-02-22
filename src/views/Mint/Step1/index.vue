@@ -1,55 +1,54 @@
 <template>
-  <div class="page-container">
-    <v-card class="pa-4 mt-4 white-bg main-content" variant="outlined" rounded="xl">
-      <v-card-title class="d-flex justify-center">Claim Rank</v-card-title>
+  <v-card class="pa-4 my-4 white-bg" :class="{'mx-1': !mobile}">
+    <v-card-title class="pl-0">Claim Rank</v-card-title>
 
-      <m-alert :type="alertInfo.type" :msg="alertInfo.msg"></m-alert>
-      <!-- <v-alert closable v-if="!!term" type="warning">This address has already minted MEN</v-alert> -->
+    <m-alert :type="alertInfo.type" :msg="alertInfo.msg"></m-alert>
 
+    <section class="mt-5">
+      <div class="my-text-color">Enter Number of days</div>
       <v-sheet
         rounded
-        class="mx-auto w-100 pa-2"
+        class="mx-auto w-100 pa-2 mt-1"
+        color="#ededed"
       >
-        <section class="text-body-2 text-center">Number of days</section>
 
-        <section class="text-center">
-          <m-input v-model="days" :max="maxTerm" />
-        </section>
+        <m-input v-model="days" :max="maxTerm" />
       </v-sheet>
+    </section>
 
-      <section class="mt-6">
-        <m-panel :data="panelData"></m-panel>
-      </section>
+    <section class="mt-6">
+      <m-panel :data="panelData"></m-panel>
+    </section>
 
-      <v-sheet
-        rounded
-        class="mx-auto w-100 mt-4 pa-4"
-      >
-        <span class="text-caption">Your mint starts by claiming a rank. Select the number of days you want to mint for. The longer you mint for, the more rewards you will receive. You can mint for a maximum of 100 days.</span>
-      </v-sheet>
+    <v-sheet
+      rounded
+      class="mx-auto w-100 mt-4"
+    >
+      <span class="text-caption">Your mint starts by claiming a rank. Select the number of days you want to mint for. The longer you mint for, the more rewards you will receive. You can mint for a maximum of 100 days.</span>
+    </v-sheet>
 
-      <v-btn
-        block
-        size="large"
-        class="my-4"
-        color="primary"
-        @click="mint"
-        :loading="mintLoading"
-        :disabled="!!term"
-        rounded="pill"
-      >
-        Mint
-      </v-btn>
-    </v-card>
-    <v-card class="pa-4 mx-5 white-bg next-page" variant="outlined" rounded="xl"></v-card>
-  </div>
+    <v-btn
+      block
+      size="large"
+      class="my-4"
+      color="#5CE199"
+      @click="mint"
+      :loading="mintLoading"
+      :disabled="!!term"
+      rounded="pill"
+    >
+      Start Mint
+    </v-btn>
+  </v-card>
 </template>
 
 <script setup>
   import { computed, reactive, ref, watch, watchEffect } from "vue"
   import { useMintStore } from "@/store/mint"
   import { storeToRefs } from "pinia"
-  import { validate } from "@/utils"
+  import { useDisplay } from 'vuetify'
+
+  const { mobile } = useDisplay()
 
   const mintStore = useMintStore()
   const { maxTerm, rank, term, error, mintLoading, maturityTs } = storeToRefs(mintStore)
@@ -77,19 +76,17 @@
       {
         title: 'Claim rank',
         value: rank.value,
-        name: ''
+        name: '',
+        tip: ''
       },
       {
         title: 'Maturity',
         value: days.value,
-        name: 'days'
+        name: 'days',
+        tip: ''
       }
     ]
   })
-
-  const maxDays = () => {
-    days.value = maxTerm.value
-  }
 
   watch(maturityTs, (ts) => {
     if (ts > 0) {
@@ -107,7 +104,7 @@
   ];
 
   const mint = async () => {
-    const valid = validate(daysRules, days.value)
+    const valid = mValidate(daysRules, days.value)
 
     if (!valid.status) {
       alertInfo.type = 'warning'
@@ -120,17 +117,5 @@
 </script>
 
 <style scoped>
-  .page-container {
-    position: relative;
-    z-index: 2;
-  }
-  .main-content {
-    position: relative;
-    z-index: 2;
-  }
-  .next-page {
-    position: relative;
-    bottom: 18px;
-    z-index: 1;
-  }
+
 </style>

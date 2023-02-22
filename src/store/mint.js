@@ -207,6 +207,7 @@ export const useMintStore = defineStore({
       }
     },
     async claimMintRewardAndShare(address, pct) {
+      console.log('12')
       if (this.maturityPer < 100) {
         return this.claimShareError = "No MEN available to claim yet"
       }

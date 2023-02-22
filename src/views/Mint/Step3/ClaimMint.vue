@@ -1,47 +1,23 @@
 <template>
-  <v-card class="pa-4 mt-4">
+  <v-card class="pa-4 my-4 white-bg" :class="{'mx-1': !mobile}">
     <v-card-title class="px-0">Claim Mint</v-card-title>
 
-    <v-alert v-if="claimError" type="error">{{ claimError }}</v-alert>
+    <m-alert :type="alertInfo.type" :msg="alertInfo.msg"></m-alert>
 
-    <v-row>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2 "
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Reward</span>
-            <span class="text-body-2">{{ reward }}</span>
-          </div>
-        </v-sheet>
-      </v-col>
-      <v-col>
-        <v-sheet
-          rounded
-          color="grey-lighten-3"
-          class="mx-auto w-100 mt-4 pa-2"
-          height="100"
-        >
-          <div class="d-flex flex-column justify-space-between fill-height">
-            <span class="text-subtitle-2">Penalty</span>
-            <span class="text-body-2">{{ penalty }}%</span>
-          </div>
-        </v-sheet>
-      </v-col>
-    </v-row>
+    <section class="mt-6">
+      <m-panel :data="panelData"></m-panel>
+    </section>
 
     <v-btn
       block
       size="large"
-      class="mt-4"
-      color="primary"
+      class="mt-6 mb-3"
+      color="#5CE199"
       @click="claimMint"
       :loading="loading"
+      rounded="pill"
     >
-      CLAIM MINT
+      Claim Mint
     </v-btn>
   </v-card>
 </template>
@@ -49,11 +25,26 @@
 <script setup>
   import { useMintStore } from "@/store/mint";
   import { storeToRefs } from "pinia";
-  import { ref, toRefs } from "vue";
+  import { reactive, toRefs, computed, watchEffect } from "vue";
+  import { useDisplay } from 'vuetify'
+
+  const { mobile } = useDisplay()
 
   const mintStore = useMintStore()
 
   const { claimError } = storeToRefs(mintStore)
+
+  let alertInfo = reactive({
+    type: '',
+    msg: ''
+  })
+
+  watchEffect(() => {
+    if (!!claimError.value) {
+      alertInfo.type = 'error'
+      alertInfo.msg = claimError
+    }
+  })
 
   const props = defineProps({
     reward: Number,
@@ -61,7 +52,24 @@
     loading: Boolean
   })
 
-  const { reward } = toRefs(props)
+  const { reward, penalty } = toRefs(props)
+
+  const panelData = computed(() => {
+    return [
+      {
+        title: 'Reward',
+        value: reward,
+        name: '',
+        tip: ''
+      },
+      {
+        title: 'Penalty',
+        value: penalty.value + "%",
+        name: '',
+        tip: ''
+      }
+    ]
+  })
 
   const claimMint = () => {
     mintStore.claimMintReward()
