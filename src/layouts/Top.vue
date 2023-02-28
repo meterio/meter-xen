@@ -135,10 +135,10 @@
 
   if (route.path.includes('mint')) {
     mintBtnActive.value = true
-  }
-
-  if (route.path.includes('stake')) {
+  } else if (route.path.includes('stake')) {
     stakeBtnActive.value = true
+  } else {
+    mintBtnActive.value = true
   }
 
   watchEffect(() => {

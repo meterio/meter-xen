@@ -7,7 +7,7 @@ export const chains = [
     blockExplorer: "https://scan.meter.io",
     nativeTokenSymbol: "MTR",
     nativeTokenDecimals: 18,
-    contract: "",
+    contract: "0x01d18666A27Cf91F32549f181F53e517BA6dc473",
     mtrgAddr: "0x228ebBeE999c6a7ad74A6130E81b12f9Fe237Ba3"
   },
   {
