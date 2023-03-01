@@ -27,7 +27,26 @@ export const useStakeStore = defineStore({
   }),
   getters: {},
   actions: {
+    clearData() {
+      this.maxTerm = 1000
+      this.term = 0
+      this.amount = 0
+      this.stakedAmount = 0
+      this.totalStaked = 0
+      this.apy = 0
+      this.currentAPY = 0
+      this.maturityPer = 0
+      this.reward = 0
+      this.dayInYear = 365
+
+      this.stakeLoading = false
+      this.withdrawLoading = false
+
+      this.stakeError = ""
+      this.withdrawError = ""
+    },
     async initData() {
+      this.clearData()
       console.log('stake init data')
       const { xenContract, wallet } = useWalletStore()
       const [userStakes, amount, currentAPY, totalStaked, dayInYear] = await Promise.all([
@@ -38,7 +57,7 @@ export const useStakeStore = defineStore({
         xenContract.DAYS_IN_YEAR()
       ])
 
-      console.log('userStakes', userStakes)
+      // console.log('userStakes', userStakes)
       // console.log('amount', BigNumber.from(amount).div((10 ** 18).toString()))
       // console.log('totalStaked', BigNumber.from(totalStaked).div((10 ** 18).toString()).toString())
       this.totalStaked = BigNumber.from(totalStaked).div((10 ** 18).toString()).toString()
@@ -57,7 +76,7 @@ export const useStakeStore = defineStore({
         const nowTime = Date.now()
         const totalTime = BigNumber.from(userStakes.term).mul(24 * 3600 * 1000)
         this.maturityPer = ((1 - (endTime.sub(nowTime).toNumber() / totalTime.toNumber())) * 100).toFixed(2)
-        console.log('maturityPer', this.maturityPer)
+        // console.log('maturityPer', this.maturityPer)
         const rate = this.apy * this.term * 1000000 / this.dayInYear;
         this.reward = (this.stakedAmount * rate / 100000000).toFixed(2);
 

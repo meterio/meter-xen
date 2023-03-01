@@ -33,7 +33,30 @@ export const useMintStore = defineStore({
   }),
   getters: {},
   actions: {
+    clearData() {
+      this.user = ""
+      this.maxTerm = 0
+      this.rank = 0
+      this.maturityTs = 0
+      this.maturityPer = 0
+      this.term = 0
+      this.amplifier = 0
+      this.eaaRate = 0
+      this.globalRank = 0
+      this.grossReward = 0
+      this.penalty = 0
+      this.error = ""
+      this.claimError = ""
+      this.claimShareError = ""
+      this.claimStakeError = ""
+
+      this.mintLoading = false
+      this.claimRewardLoading = false
+      this.claimRewardAndShareLoading = false
+      this.claimRewardAndStakeLoading = false
+    },
     async initData() {
+      this.clearData()
       console.log('mint init data')
       const { xenContract, wallet } = useWalletStore()
       const [maxTerm, userMints, globalRank] = await Promise.all([
@@ -41,7 +64,7 @@ export const useMintStore = defineStore({
         xenContract.userMints(wallet.account),
         xenContract.globalRank(),
       ])
-      console.log('mint info', userMints)
+      // console.log('mint info', userMints)
       // console.log('maturityTs', new Date(BigNumber.from(userMints.maturityTs).toNumber() * 1000))
       
       // console.log('maxTerm', BigNumber.from(maxTerm).div(24 * 3600).toNumber())
@@ -53,7 +76,7 @@ export const useMintStore = defineStore({
       this.amplifier = BigNumber.from(userMints.amplifier).toNumber()
       this.eaaRate = BigNumber.from(userMints.eaaRate).toNumber()
       this.globalRank = BigNumber.from(globalRank).toNumber()
-      console.log('global rank', this.globalRank)
+      // console.log('global rank', this.globalRank)
 
       if (!this.rank) {
         this.rank = this.globalRank
@@ -68,12 +91,12 @@ export const useMintStore = defineStore({
         const totalTime = BigNumber.from(userMints.term).mul(24 * 3600 * 1000)
         // console.log('percent', (endTime.sub(nowTime).toNumber() / totalTime.toNumber()).toFixed(2))
         this.maturityPer = ((1 - (endTime.sub(nowTime).toNumber() / totalTime.toNumber())) * 100).toFixed(2)
-        console.log('maturityPer', this.maturityPer)
+        // console.log('maturityPer', this.maturityPer)
   
         const rankDelta = Math.max(this.globalRank - this.rank, 2)
   
         const grossReward = await xenContract.getGrossReward(rankDelta, this.amplifier, this.term, this.eaaRate + 1000)
-        console.log('gross reward', grossReward.toNumber())
+        // console.log('gross reward', grossReward.toNumber())
         this.grossReward = grossReward.toNumber()
 
         // for step3 penalty
@@ -104,7 +127,7 @@ export const useMintStore = defineStore({
       const claimRankId = uuidv4()
       try {
         this.mintLoading = true
-        console.log('term', term)
+        // console.log('term', term)
         const { xenContract, wallet } = useWalletStore()
         // get approve amount
         const mintValue = await xenContract.mintValue()
@@ -207,7 +230,6 @@ export const useMintStore = defineStore({
       }
     },
     async claimMintRewardAndShare(address, pct) {
-      console.log('12')
       if (this.maturityPer < 100) {
         return this.claimShareError = "No MEN available to claim yet"
       }
