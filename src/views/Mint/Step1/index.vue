@@ -15,6 +15,10 @@
         <m-input v-model="days" :max="maxTerm" />
       </v-sheet>
     </section>
+    <section class="d-flex justify-space-between">
+      <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Estimate Reward</v-btn>
+      <span class="d-flex align-center my-text-color">{{ estimateReward }} MEN</span>
+    </section>
 
     <section class="mt-6">
       <m-panel :data="panelData"></m-panel>
@@ -40,6 +44,41 @@
       Start Mint
     </v-btn>
   </v-card>
+  <!-- dialog for estimate men -->
+  <!-- <v-dialog
+    transition="dialog-bottom-transition"
+    width="auto"
+    v-model:model-value="isActive"
+  >
+    <template v-slot:default="{ isActive }">
+      <v-card>
+        <v-toolbar
+          color="primary"
+          title="Estimate Reward"
+        ></v-toolbar>
+        <v-card-text>
+          <section class="mt-5">
+            <div class="my-text-color">Wallet Address</div>
+            <v-sheet
+              rounded
+              class="mx-auto w-100 pa-2 mt-1"
+              color="#ededed"
+            >
+
+              <m-input v-model="walletAddr" :plain="true" />
+            </v-sheet>
+            <span class="my-text-color mt-1">Wallet address where you want to share your MEN</span>
+          </section>
+        </v-card-text>
+        <v-card-actions class="justify-end">
+          <v-btn
+            variant="text"
+            @click="isActive.value = false"
+          >Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </template>
+  </v-dialog> -->
 </template>
 
 <script setup>
@@ -51,7 +90,7 @@
   const { mobile } = useDisplay()
 
   const mintStore = useMintStore()
-  const { maxTerm, rank, term, error, mintLoading, maturityTs } = storeToRefs(mintStore)
+  const { maxTerm, rank, term, error, mintLoading, maturityTs, estimateReward } = storeToRefs(mintStore)
 
   let alertInfo = reactive({
     type: '',
@@ -97,6 +136,12 @@
     }
   }, {immediate: true})
 
+  watch(days, (d) => {
+    if (!Number.isNaN(Number(d)) && Number(d) > 0) {
+      mintStore.calcMintReward(d)
+    }
+  })
+
   const daysRules = [
     v => !!v || 'days is required',
     v => (v && !isNaN(Number(v))) || 'days must be a number',
@@ -114,6 +159,8 @@
       mintStore.claimRank(days.value)
     }
   }
+
+  const isActive = ref(false)
 </script>
 
 <style scoped>

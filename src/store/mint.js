@@ -29,11 +29,13 @@ export const useMintStore = defineStore({
     mintLoading: false,
     claimRewardLoading: false,
     claimRewardAndShareLoading: false,
-    claimRewardAndStakeLoading: false
+    claimRewardAndStakeLoading: false,
+
+    estimateReward: 0
   }),
   getters: {},
   actions: {
-    clearData() {
+    async clearData() {
       this.user = ""
       this.maxTerm = 0
       this.rank = 0
@@ -54,15 +56,19 @@ export const useMintStore = defineStore({
       this.claimRewardLoading = false
       this.claimRewardAndShareLoading = false
       this.claimRewardAndStakeLoading = false
+
+      this.estimateReward = 0
     },
     async initData() {
-      this.clearData()
+      await this.clearData()
       console.log('mint init data')
       const { xenContract, wallet } = useWalletStore()
-      const [maxTerm, userMints, globalRank] = await Promise.all([
+      const [maxTerm, userMints, globalRank, cAmp, cEaar] = await Promise.all([
         xenContract.getCurrentMaxTerm(),
         xenContract.userMints(wallet.account),
         xenContract.globalRank(),
+        xenContract.getCurrentAMP(),
+        xenContract.getCurrentEAAR()
       ])
       // console.log('mint info', userMints)
       // console.log('maturityTs', new Date(BigNumber.from(userMints.maturityTs).toNumber() * 1000))
@@ -78,8 +84,17 @@ export const useMintStore = defineStore({
       this.globalRank = BigNumber.from(globalRank).toNumber()
       // console.log('global rank', this.globalRank)
 
+      const cAmplifier = BigNumber.from(cAmp).toNumber()
+      const cEaaRate = BigNumber.from(cEaar).toNumber()
+
       if (!this.rank) {
         this.rank = this.globalRank
+      }
+      if (!this.amplifier) {
+        this.amplifier = cAmplifier
+      }
+      if (!this.eaaRate) {
+        this.eaaRate = cEaaRate
       }
 
       const maturityTs = BigNumber.from(userMints.maturityTs).toNumber()
@@ -300,6 +315,14 @@ export const useMintStore = defineStore({
         txinfoStore.removeTxinfo({ id: claimRewardStakeId })
         this.claimRewardAndStakeLoading = false
       }
+    },
+    async calcMintReward(term) {
+      const { xenContract } = useWalletStore()
+      const maturityTs = Math.floor(Date.now() / 1000) - 20
+      // console.log({rank: this.rank, term, maturityTs, amplifier: this.amplifier, eaaRate: this.eaaRate})
+      const reward = await xenContract.calculateMintReward(this.globalRank, term, maturityTs, this.amplifier, this.eaaRate)
+      // console.log(BigNumber.from(reward).toNumber())
+      this.estimateReward = BigNumber.from(reward).toNumber()
     }
   }
 })

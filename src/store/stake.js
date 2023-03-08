@@ -27,7 +27,7 @@ export const useStakeStore = defineStore({
   }),
   getters: {},
   actions: {
-    clearData() {
+    async clearData() {
       this.maxTerm = 1000
       this.term = 0
       this.amount = 0
@@ -46,7 +46,7 @@ export const useStakeStore = defineStore({
       this.withdrawError = ""
     },
     async initData() {
-      this.clearData()
+      await this.clearData()
       console.log('stake init data')
       const { xenContract, wallet } = useWalletStore()
       const [userStakes, amount, currentAPY, totalStaked, dayInYear] = await Promise.all([
