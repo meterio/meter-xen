@@ -110,7 +110,7 @@ export const useMintStore = defineStore({
   
         const rankDelta = Math.max(this.globalRank - this.rank, 2)
   
-        const grossReward = await xenContract.getGrossReward(rankDelta, this.amplifier, this.term, this.eaaRate + 1000)
+        const grossReward = await this.getGrossReward(rankDelta, this.amplifier, this.term, this.eaaRate)
         // console.log('gross reward', grossReward.toNumber())
         this.grossReward = grossReward.toNumber()
 
@@ -316,13 +316,20 @@ export const useMintStore = defineStore({
         this.claimRewardAndStakeLoading = false
       }
     },
-    async calcMintReward(term) {
-      const { xenContract } = useWalletStore()
-      const maturityTs = Math.floor(Date.now() / 1000) - 20
+    async calcMintReward(term, rankDelta) {
+      // const { xenContract } = useWalletStore()
+      // const maturityTs = Math.floor(Date.now() / 1000) - 20
       // console.log({rank: this.rank, term, maturityTs, amplifier: this.amplifier, eaaRate: this.eaaRate})
-      const reward = await xenContract.calculateMintReward(this.globalRank, term, maturityTs, this.amplifier, this.eaaRate)
+      // const reward = await xenContract.calculateMintReward(this.globalRank, term, maturityTs, this.amplifier, this.eaaRate)
       // console.log(BigNumber.from(reward).toNumber())
+      const reward = await this.getGrossReward(rankDelta, this.amplifier, term, this.eaaRate)
+      // console.log('reward', reward)
       this.estimateReward = BigNumber.from(reward).toNumber()
+    },
+    async getGrossReward(rankDelta, amplifier, term, eaaRate) {
+      const { xenContract } = useWalletStore()
+      const res = await xenContract.getGrossReward(rankDelta, amplifier, term, eaaRate + 1000)
+      return res
     }
   }
 })

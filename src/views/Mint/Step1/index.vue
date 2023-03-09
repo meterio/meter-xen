@@ -17,7 +17,7 @@
     </section>
     <section class="d-flex justify-space-between">
       <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Estimate Reward</v-btn>
-      <span class="d-flex align-center my-text-color">{{ estimateReward }} MEN</span>
+      <!-- <span class="d-flex align-center my-text-color">{{ estimateReward }} MEN</span> -->
     </section>
 
     <section class="mt-6">
@@ -45,7 +45,7 @@
     </v-btn>
   </v-card>
   <!-- dialog for estimate men -->
-  <!-- <v-dialog
+  <v-dialog
     transition="dialog-bottom-transition"
     width="auto"
     v-model:model-value="isActive"
@@ -58,16 +58,35 @@
         ></v-toolbar>
         <v-card-text>
           <section class="mt-5">
-            <div class="my-text-color">Wallet Address</div>
+            <div class="my-text-color">Terms</div>
             <v-sheet
               rounded
               class="mx-auto w-100 pa-2 mt-1"
               color="#ededed"
             >
 
-              <m-input v-model="walletAddr" :plain="true" />
+              <m-input v-model="terms" :plain="true" :max="maxTerm" />
             </v-sheet>
-            <span class="my-text-color mt-1">Wallet address where you want to share your MEN</span>
+            <span class="my-text-color mt-1">Enter Number of days</span>
+          </section>
+          <section class="mt-5">
+            <div class="my-text-color">New Users</div>
+            <v-sheet
+              rounded
+              class="mx-auto w-100 pa-2 mt-1"
+              color="#ededed"
+            >
+
+              <m-input v-model="rankDelta" :plain="true" />
+            </v-sheet>
+            <span class="my-text-color mt-1">Rank Delta</span>
+          </section>
+          <section class="mt-5 d-flex justify-space-between">
+            <span class="my-text-color">Estimate Reward:</span>
+            <div>
+              <span class="font-weight-bold">{{ estimateReward }}</span>
+              <span class="my-text-color"> MEN</span>
+            </div>
           </section>
         </v-card-text>
         <v-card-actions class="justify-end">
@@ -78,7 +97,7 @@
         </v-card-actions>
       </v-card>
     </template>
-  </v-dialog> -->
+  </v-dialog>
 </template>
 
 <script setup>
@@ -136,12 +155,6 @@
     }
   }, {immediate: true})
 
-  watch(days, (d) => {
-    if (!Number.isNaN(Number(d)) && Number(d) > 0) {
-      mintStore.calcMintReward(d)
-    }
-  })
-
   const daysRules = [
     v => !!v || 'days is required',
     v => (v && !isNaN(Number(v))) || 'days must be a number',
@@ -161,6 +174,18 @@
   }
 
   const isActive = ref(false)
+  const terms = ref(0)
+  const rankDelta = ref(0)
+
+  watchEffect(() => {
+    const validTerms = !Number.isNaN(Number(terms.value)) && Number(terms.value) > 0
+    const validRankDelta = !Number.isNaN(Number(rankDelta.value)) && Number(rankDelta.value) > 0
+    if (validTerms && validRankDelta) {
+      mintStore.calcMintReward(term.value, rankDelta.value)
+    } else {
+      estimateReward.value = 0
+    }
+  })
 </script>
 
 <style scoped>
