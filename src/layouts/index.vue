@@ -2,6 +2,7 @@
   <v-app>
     <top-page />
     <default-view />
+    <bottom-page />
     <v-snackbar
       v-if="txinfos.length"
       v-model="snackbar"
@@ -25,28 +26,6 @@
           </v-btn>
         </div>
       </v-list-item>
-      <!-- <v-list-item prepend-icon="mdi-check-bold">
-        <div class="d-flex justify-space-between">
-          <span>1</span>
-          <v-btn
-            color="pink"
-            variant="text"
-            @click="viewScan(item.hash)"
-          >
-            View
-          </v-btn>
-        </div>
-      </v-list-item> -->
-
-      <!-- <template v-slot:actions>
-        <v-btn
-          color="pink"
-          variant="text"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
-      </template> -->
     </v-snackbar>
   </v-app>
 </template>
@@ -55,6 +34,7 @@
   import { ref } from 'vue'
   import { useTxinfoStore } from '@/store/txinfo'
   import TopPage from './Top.vue'
+  import BottomPage from './Bottom.vue'
   import DefaultView from './View.vue'
   import { storeToRefs } from 'pinia'
   import { useWalletStore } from '@/store/wallet'

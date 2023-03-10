@@ -16,7 +16,7 @@
       </v-sheet>
     </section>
     <section class="d-flex justify-space-between">
-      <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Estimate Reward</v-btn>
+      <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Reward Calculate</v-btn>
       <!-- <span class="d-flex align-center my-text-color">{{ estimateReward }} MEN</span> -->
     </section>
 
@@ -54,7 +54,7 @@
       <v-card>
         <v-toolbar
           color="primary"
-          title="Estimate Reward"
+          title="Reward Calculate"
         ></v-toolbar>
         <v-card-text>
           <section class="mt-5">
@@ -67,7 +67,7 @@
 
               <m-input v-model="terms" :plain="true" :max="maxTerm" />
             </v-sheet>
-            <span class="my-text-color mt-1">Enter Number of days</span>
+            <span class="my-text-color mt-1">Wait for Number of Days to Claim</span>
           </section>
           <section class="mt-5">
             <div class="my-text-color">New Users</div>
@@ -79,10 +79,10 @@
 
               <m-input v-model="rankDelta" :plain="true" />
             </v-sheet>
-            <span class="my-text-color mt-1">Rank Delta</span>
+            <span class="my-text-color mt-1">Number of New Users After You</span>
           </section>
           <section class="mt-5 d-flex justify-space-between">
-            <span class="my-text-color">Estimate Reward:</span>
+            <span class="my-text-color">Reward:</span>
             <div>
               <span class="font-weight-bold">{{ estimateReward }}</span>
               <span class="my-text-color"> MEN</span>
@@ -181,7 +181,7 @@
     const validTerms = !Number.isNaN(Number(terms.value)) && Number(terms.value) > 0
     const validRankDelta = !Number.isNaN(Number(rankDelta.value)) && Number(rankDelta.value) > 0
     if (validTerms && validRankDelta) {
-      mintStore.calcMintReward(term.value, rankDelta.value)
+      mintStore.calcMintReward(terms.value, rankDelta.value)
     } else {
       estimateReward.value = 0
     }

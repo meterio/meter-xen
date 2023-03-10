@@ -9,7 +9,7 @@
     </section>
 
     <section class="mt-5">
-      <div class="my-text-color">Stake Percentage</div>
+      <div class="my-text-color">Share Percentage</div>
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
