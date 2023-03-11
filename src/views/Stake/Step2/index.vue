@@ -7,7 +7,7 @@
         <span class="my-text-color">Progress</span>
         <span class="item-value">{{ maturityPer }}%</span>
       </div>
-      <v-progress-linear class="mt-1" :model-value="maturityPer" color="#5ce199" height="25" rounded="pill"></v-progress-linear>
+      <v-progress-linear class="mt-1" :model-value="maturityPer" color="primary" height="25" rounded="pill"></v-progress-linear>
     </section>
 
     <section v-for="item in data" :key="item.key" class="d-flex justify-space-between mt-4">
@@ -29,7 +29,7 @@
       block
       size="large"
       class="my-4"
-      color="#5CE199"
+      color="primary"
       disabled
       rounded="pill"
     >

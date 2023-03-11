@@ -1,11 +1,10 @@
 <template>
   <div class="d-flex justify-center global-bg-color">
     <v-btn
-      class="mx-6"
-      variant="outlined"
+      class="mx-6 mb-2"
       size="x-small"
       icon
-      color="primary"
+      color="lightGray"
       v-for="item in dataList"
       :key="item.name"
       @click="jump(item.link)"

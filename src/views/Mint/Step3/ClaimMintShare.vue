@@ -13,7 +13,7 @@
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
-        color="#ededed"
+        color="lightGray"
       >
 
         <m-input v-model="percentage" :max="100" />
@@ -25,7 +25,7 @@
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
-        color="#ededed"
+        color="lightGray"
       >
 
         <m-input v-model="walletAddr" :plain="true" />
@@ -37,7 +37,7 @@
       block
       size="large"
       class="mt-6 mb-3"
-      color="#5CE199"
+      color="primary"
       @click="mintShare"
       :loading="loading"
       rounded="pill"

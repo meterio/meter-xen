@@ -2,7 +2,7 @@
   <v-app>
     <top-page />
     <default-view />
-    <bottom-page />
+    <!-- <bottom-page /> -->
     <v-snackbar
       v-if="txinfos.length"
       v-model="snackbar"
@@ -34,7 +34,7 @@
   import { ref } from 'vue'
   import { useTxinfoStore } from '@/store/txinfo'
   import TopPage from './Top.vue'
-  import BottomPage from './Bottom.vue'
+  // import BottomPage from './Bottom.vue'
   import DefaultView from './View.vue'
   import { storeToRefs } from 'pinia'
   import { useWalletStore } from '@/store/wallet'

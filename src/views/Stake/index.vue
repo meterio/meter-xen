@@ -22,11 +22,14 @@
 
       <router-view />
 
+      <bottom-page />
+
     </v-responsive>
   </v-container>
 </template>
 
 <script setup>
+  import BottomPage from '@/layouts/Bottom.vue'
   import { computed, ref } from "vue"
   import { useRouter, useRoute } from "vue-router"
   import useMaxWidth from "@/hooks/useMaxWidth"

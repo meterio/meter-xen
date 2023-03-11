@@ -12,7 +12,7 @@
       block
       size="large"
       class="mt-6 mb-3"
-      color="#5CE199"
+      color="primary"
       @click="claimMint"
       :loading="loading"
       rounded="pill"

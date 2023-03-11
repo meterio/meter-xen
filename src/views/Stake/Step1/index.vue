@@ -9,7 +9,7 @@
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
-        color="#ededed"
+        color="lightGray"
       >
 
         <m-input v-model="stakeAmount" :max="amount" />
@@ -22,7 +22,7 @@
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
-        color="#ededed"
+        color="lightGray"
       >
 
         <m-input v-model="days" :max="maxTerm" />
@@ -44,7 +44,7 @@
       block
       size="large"
       class="my-4"
-      color="#5CE199"
+      color="primary"
       @click="startStake"
       :loading="stakeLoading"
       :disabled="!!term"

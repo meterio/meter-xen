@@ -9,7 +9,7 @@
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
-        color="#ededed"
+        color="lightGray"
       >
 
         <m-input v-model="days" :max="maxTerm" />
@@ -35,7 +35,7 @@
       block
       size="large"
       class="my-4"
-      color="#5CE199"
+      color="primary"
       @click="mint"
       :loading="mintLoading"
       :disabled="!!term"
@@ -174,14 +174,18 @@
   }
 
   const isActive = ref(false)
-  const terms = ref(0)
-  const rankDelta = ref(0)
+  const terms = ref(30)
+  const rankDelta = ref(1000)
 
   watchEffect(() => {
     const validTerms = !Number.isNaN(Number(terms.value)) && Number(terms.value) > 0
-    const validRankDelta = !Number.isNaN(Number(rankDelta.value)) && Number(rankDelta.value) > 0
+    const validRankDelta = !Number.isNaN(Number(rankDelta.value)) && Number(rankDelta.value) >= 0
     if (validTerms && validRankDelta) {
-      mintStore.calcMintReward(terms.value, rankDelta.value)
+      if (Number(rankDelta.value) < 2) {
+        mintStore.calcMintReward(terms.value, 2)
+      } else {
+        mintStore.calcMintReward(terms.value, rankDelta.value)
+      }
     } else {
       estimateReward.value = 0
     }

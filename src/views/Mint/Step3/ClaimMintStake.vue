@@ -13,7 +13,7 @@
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
-        color="#ededed"
+        color="lightGray"
       >
 
         <m-input v-model="percentage" :max="100" />
@@ -25,7 +25,7 @@
       <v-sheet
         rounded
         class="mx-auto w-100 pa-2 mt-1"
-        color="#ededed"
+        color="lightGray"
       >
 
         <m-input v-model="days" :max="1000" />
@@ -36,7 +36,7 @@
       block
       size="large"
       class="mt-4"
-      color="#5CE199"
+      color="primary"
       @click="mintStake"
       :loading="loading"
       rounded="pill"

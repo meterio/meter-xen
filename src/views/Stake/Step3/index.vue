@@ -19,7 +19,7 @@
       block
       size="large"
       class="my-4"
-      color="#5CE199"
+      color="primary"
       @click="endStake"
       :loading="withdrawLoading"
       rounded="pill"

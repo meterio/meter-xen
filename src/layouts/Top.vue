@@ -46,7 +46,7 @@
                 <template v-slot:activator="{ props }">
                   <v-chip color="white" v-if="wallet.networkName" v-bind="props" link>
                     {{ wallet.networkName }}
-                    <v-icon icon="mdi-chevron-down"></v-icon>
+                    <v-icon icon="mdi:mdi-chevron-down"></v-icon>
                   </v-chip>
                 </template>
                 <v-card class="menu-container d-flex flex-column">
