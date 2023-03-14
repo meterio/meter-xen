@@ -177,6 +177,12 @@
   const terms = ref(30)
   const rankDelta = ref(1000)
 
+  watch(days, () => {
+    if (days.value) {
+      terms.value = days.value
+    }
+  })
+
   watchEffect(() => {
     const validTerms = !Number.isNaN(Number(terms.value)) && Number(terms.value) > 0
     const validRankDelta = !Number.isNaN(Number(rankDelta.value)) && Number(rankDelta.value) >= 0
