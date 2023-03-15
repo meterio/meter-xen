@@ -18,7 +18,7 @@
           :text="item.tip"
         >
           <template v-slot:activator="{ props }">
-            <v-icon class="ml-1" size="xsmall" v-bind="props" icon="mdi-information"></v-icon>
+            <v-icon class="ml-1" size="xsmall" v-bind="props" icon="mdi:mdi-information"></v-icon>
           </template>
         </v-tooltip>
       </div>
@@ -30,8 +30,9 @@
       size="large"
       class="my-4"
       color="primary"
-      disabled
+      :disabled="isDisabled"
       rounded="pill"
+      @click="nextPage"
     >
       Claim Mint
     </v-btn>
@@ -41,13 +42,14 @@
 <script setup>
   import { useMintStore } from "@/store/mint";
   import { storeToRefs } from "pinia";
-  import { computed } from "vue";
+  import { computed, ref, watchEffect } from "vue";
   import { useDisplay } from 'vuetify'
+  import { useRouter } from "vue-router"
 
   const { mobile } = useDisplay()
 
   const mintStore =  useMintStore()
-  const { rank, term, amplifier, eaaRate, maturityPer, grossReward } = storeToRefs(mintStore)
+  const { rank, term, amplifier, eaaRate, maturityPer, grossReward, maturityTs } = storeToRefs(mintStore)
 
   const data = computed(() => [
     {
@@ -76,6 +78,23 @@
       tip: ""
     }
   ])
+
+  const isDisabled = ref(true)
+
+  watchEffect(() => {
+    
+    if (maturityTs.value && maturityTs.value * 1000 < Date.now()) {
+      isDisabled.value = false
+    }
+  })
+
+  const router = useRouter()
+
+  const nextPage = () => {
+    router.push({
+      name: 'MintStep3'
+    })
+  }
 </script>
 
 <style scoped>

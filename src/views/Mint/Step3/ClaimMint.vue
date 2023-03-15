@@ -16,6 +16,7 @@
       @click="claimMint"
       :loading="loading"
       rounded="pill"
+      :disabled="isDisabled"
     >
       Claim Mint
     </v-btn>
@@ -25,14 +26,14 @@
 <script setup>
   import { useMintStore } from "@/store/mint";
   import { storeToRefs } from "pinia";
-  import { reactive, toRefs, computed, watchEffect } from "vue";
+  import { reactive, toRefs, computed, watchEffect, ref } from "vue";
   import { useDisplay } from 'vuetify'
 
   const { mobile } = useDisplay()
 
   const mintStore = useMintStore()
 
-  const { claimError } = storeToRefs(mintStore)
+  const { claimError, maturityTs } = storeToRefs(mintStore)
 
   let alertInfo = reactive({
     type: '',
@@ -74,4 +75,13 @@
   const claimMint = () => {
     mintStore.claimMintReward()
   }
+
+  const isDisabled = ref(true)
+
+  watchEffect(() => {
+    
+    if (maturityTs.value && maturityTs.value * 1000 < Date.now()) {
+      isDisabled.value = false
+    }
+  })
 </script>

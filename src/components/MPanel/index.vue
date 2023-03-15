@@ -15,7 +15,7 @@
           :text="item.tip"
         >
           <template v-slot:activator="{ props }">
-            <v-icon class="ml-1" size="xsmall" v-bind="props" icon="mdi-information"></v-icon>
+            <v-icon class="ml-1" size="xsmall" v-bind="props" icon="mdi:mdi-information"></v-icon>
           </template>
         </v-tooltip>
       </div>

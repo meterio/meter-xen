@@ -23,6 +23,7 @@
       @click="endStake"
       :loading="withdrawLoading"
       rounded="pill"
+      :disabled="!term"
     >
       <span v-if="maturityPer < 100">Early End Stake</span>
       <span v-else>End Stake</span>
@@ -39,7 +40,7 @@
   const { mobile } = useDisplay()
 
   const stakeStore = useStakeStore()
-  const { maturityPer, reward, withdrawLoading, withdrawError } = storeToRefs(stakeStore)
+  const { maturityPer, reward, withdrawLoading, withdrawError, term } = storeToRefs(stakeStore)
 
   let alertInfo = reactive({
     type: '',
@@ -57,7 +58,7 @@
     return [
       {
         title: 'Reward',
-        value: reward,
+        value: reward.value,
         name: 'MEN',
         tip: ''
       }

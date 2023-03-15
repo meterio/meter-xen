@@ -41,6 +41,7 @@
       @click="mintShare"
       :loading="loading"
       rounded="pill"
+      :disabled="isDisabled"
     >
     Claim Mint + Share
     </v-btn>
@@ -58,7 +59,7 @@
 
   const mintStore = useMintStore()
 
-  const { claimShareError } = storeToRefs(mintStore)
+  const { claimShareError, maturityTs } = storeToRefs(mintStore)
 
   let alertInfo = reactive({
     type: '',
@@ -128,4 +129,13 @@
     alertInfo.msg = ''
     mintStore.claimMintRewardAndShare(walletAddr.value, percentage.value)
   }
+
+  const isDisabled = ref(true)
+
+  watchEffect(() => {
+    
+    if (maturityTs.value && maturityTs.value * 1000 < Date.now()) {
+      isDisabled.value = false
+    }
+  })
 </script>

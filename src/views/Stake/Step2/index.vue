@@ -18,7 +18,7 @@
           :text="item.tip"
         >
           <template v-slot:activator="{ props }">
-            <v-icon class="ml-1" size="xsmall" v-bind="props" icon="mdi-information"></v-icon>
+            <v-icon class="ml-1" size="xsmall" v-bind="props" icon="mdi:mdi-information"></v-icon>
           </template>
         </v-tooltip>
       </div>
@@ -30,8 +30,9 @@
       size="large"
       class="my-4"
       color="primary"
-      disabled
       rounded="pill"
+      :disabled="!term"
+      @click="nextPage"
     >
       End Stake
     </v-btn>
@@ -43,6 +44,7 @@
   import { useStakeStore } from "@/store/stake";
   import { storeToRefs } from "pinia";
   import { useDisplay } from 'vuetify'
+  import router from "@/router";
 
   const { mobile } = useDisplay()
 
@@ -71,6 +73,12 @@
       tip: ""
     }
   ])
+
+  const nextPage = () => {
+    router.push({
+      name: 'StakeStep3'
+    })
+  }
 </script>
 
 <style scoped>
