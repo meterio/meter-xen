@@ -29,12 +29,12 @@
     {
       name: "twitter",
       icon: "mdi:mdi-twitter",
-      link: "https://t.me/Meter_IO"
+      link: "https://twitter.com/Meter_IO"
     },
     {
       name: "telegram",
       icon: "fab fa-telegram",
-      link: "https://twitter.com/Meter_IO"
+      link: "https://t.me/Meter_IO"
     }
   ]
 
