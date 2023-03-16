@@ -14,6 +14,10 @@
 
         <m-input v-model="stakeAmount" :max="amount" />
       </v-sheet>
+      <span class="my-text-color d-flex justify-space-between">
+        <span>Amount</span>
+        <span>{{ amount }} MEN</span>
+      </span>
     </section>
 
     <!-- maximum stake days -->
@@ -27,6 +31,10 @@
 
         <m-input v-model="days" :max="maxTerm" />
       </v-sheet>
+      <span class="my-text-color d-flex justify-space-between">
+        <span>Max days</span>
+        <span>{{ maxTerm }}</span>
+      </span>
     </section>
     
     <section class="mt-6">

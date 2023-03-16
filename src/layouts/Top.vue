@@ -153,37 +153,18 @@
   })
 
   const goMint = () => {
+    mintStore.initData()
     mintBtnActive.value = true
     router.push({
       name: 'MintStep1'
     })
   }
   const goStake = () => {
+    stakeStore.initData()
     stakeBtnActive.value = true
     router.push({
       name: 'StakeStep1'
     })
-  }
-  // --------------------------------------------
-
-  const listenLinkValue = (link) => {
-    linkValue.value = link
-    // console.log(link)
-    if (linkValue.value === 0) {
-      mintStore.initData()
-
-      router.push({
-        name: 'MintStep1'
-      })
-    }
-
-    if (linkValue.value === 1) {
-      stakeStore.initData()
-
-      router.push({
-        name: 'StakeStep1'
-      })
-    }
   }
 
   const isSupport = computed(() => {
