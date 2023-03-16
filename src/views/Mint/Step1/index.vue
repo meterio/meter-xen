@@ -17,7 +17,6 @@
     </section>
     <section class="d-flex justify-space-between">
       <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Reward Calculate</v-btn>
-      <!-- <span class="d-flex align-center my-text-color">{{ estimateReward }} MEN</span> -->
     </section>
 
     <section class="mt-6">
@@ -43,6 +42,7 @@
     >
       Start Mint
     </v-btn>
+    <v-btn variant="plain" color="primary" class="pa-0" @click="triggerMenBuyback">Trigger MEN Buyback</v-btn>
   </v-card>
   <!-- dialog for estimate men -->
   <v-dialog
@@ -196,6 +196,10 @@
       estimateReward.value = 0
     }
   })
+
+  const triggerMenBuyback = () => {
+    mintStore.triggerMenBuyback()
+  }
 </script>
 
 <style scoped>

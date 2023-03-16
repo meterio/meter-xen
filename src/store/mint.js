@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import xenABI from "@/constants/xenABI";
 import router from "@/router";
 import { useTxinfoStore } from "./txinfo";
+import buyBackABI from "@/constants/buyBackABI";
 
 export const useMintStore = defineStore({
   id: 'mint',
@@ -30,6 +31,7 @@ export const useMintStore = defineStore({
     claimRewardLoading: false,
     claimRewardAndShareLoading: false,
     claimRewardAndStakeLoading: false,
+    triggerLoading: false,
 
     estimateReward: 0
   }),
@@ -316,6 +318,53 @@ export const useMintStore = defineStore({
         this.claimRewardAndStakeLoading = false
       }
     },
+    async triggerMenBuyback() {
+      console.log('trigger loading', this.triggerLoading)
+      if (this.triggerLoading) {
+        return
+      }
+      const txinfoStore = useTxinfoStore()
+      const triggerId = uuidv4()
+      try {
+        this.triggerLoading = true
+        const { wallet } = useWalletStore()
+        const network = chains.find(c => c.networkId === wallet.networkId)
+        const mtrgContract = new ethers.Contract(network.mtrgAddr, xenABI, wallet.signer)
+        const mtrgBalance = await mtrgContract.balanceOf(network.buybackAddr)
+        txinfoStore.updateTxinfos({
+          id: triggerId,
+          hash: '',
+          title: 'Trigger MEN Buyback',
+          status: 'pending'
+        })
+        console.log('mtrgBalance', String(mtrgBalance))
+        if (BigNumber.from(mtrgBalance).div(String(10 ** 17)).gt(4)) {
+          const buybackContract = new ethers.Contract(network.buybackAddr, buyBackABI, wallet.signer)
+          const tx = await buybackContract.buyMenAndAddLiquidity()
+
+          await tx.wait()
+
+          txinfoStore.updateTxinfos({
+            id: triggerId,
+            hash: tx.hash,
+            title: 'Trigger MEN Buyback',
+            status: 'over'
+          })
+        } else {
+          setTimeout(() => {
+            txinfoStore.removeTxinfo({ id: triggerId })
+          }, 1000);
+
+          console.log('mtrg is less than .4')
+        }
+      } catch(e) {
+        txinfoStore.removeTxinfo({ id: triggerId })
+        console.log('trigger men buyback error', e)
+      } finally {
+
+        this.triggerLoading = false
+      }
+    },
     async calcMintReward(term, rankDelta) {
       // const { xenContract } = useWalletStore()
       // const maturityTs = Math.floor(Date.now() / 1000) - 20
@@ -330,6 +379,6 @@ export const useMintStore = defineStore({
       const { xenContract } = useWalletStore()
       const res = await xenContract.getGrossReward(rankDelta, amplifier, term, eaaRate + 1000)
       return res
-    }
+    },
   }
 })
