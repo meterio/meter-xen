@@ -54,7 +54,7 @@
       <v-card>
         <v-toolbar
           color="primary"
-          title="Reward Calculate"
+          title="Reward Calculator"
         ></v-toolbar>
         <v-card-text>
           <section class="mt-5">
