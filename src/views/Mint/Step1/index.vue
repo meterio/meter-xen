@@ -16,7 +16,7 @@
       </v-sheet>
     </section>
     <section class="d-flex justify-space-between">
-      <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Reward Calculate</v-btn>
+      <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Reward Calculator</v-btn>
     </section>
 
     <section class="mt-6">
