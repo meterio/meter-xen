@@ -50,6 +50,18 @@ const routes = [
           }
         ]
       },
+      {
+        path: 'menft',
+        name: 'MENFT',
+        component: () => import('@/views/MENFT'),
+        children: [
+          {
+            path: 'mintmenft',
+            name: 'MintMENFT',
+            component: () => import('@/views/MENFT/Menft.vue')
+          }
+        ]
+      }
     ],
   },
 ]

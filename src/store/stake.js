@@ -49,6 +49,10 @@ export const useStakeStore = defineStore({
       await this.clearData()
       console.log('stake init data')
       const { xenContract, wallet } = useWalletStore()
+      if (!wallet.account) {
+        console.log('no wallet connected yet, return.')
+        return
+      }
       const [userStakes, amount, currentAPY, totalStaked, dayInYear] = await Promise.all([
         xenContract.userStakes(wallet.account),
         xenContract.balanceOf(wallet.account),

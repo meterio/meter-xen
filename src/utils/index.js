@@ -12,4 +12,26 @@ export const validate = (rules, value) => {
       msg: item
     }
   }
-} 
+}
+
+export const getMatchRoute = (route, name) => {
+  const splitRoute = route.split('/')
+  return splitRoute.includes(name)
+}
+
+export const getErrorMsg = (errorStr) => {
+
+  if (errorStr.indexOf('user rejected transaction') !== -1) {
+    return 'user rejected transaction'
+  }
+
+  const flag = 'evm: execution reverted:'
+  const flagIndex = String(errorStr).indexOf(flag)
+  if (flagIndex !== -1) {
+    const afterFlagStr = errorStr.substring(flagIndex)
+    const endIndex = afterFlagStr.indexOf(',')
+    return errorStr.substring(flagIndex, flagIndex + endIndex - 1)
+  } else {
+    return errorStr
+  }
+}

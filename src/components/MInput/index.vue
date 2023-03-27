@@ -6,6 +6,7 @@
         :style="computedMyInput"
         :value="modelValue"
         @input="$emit('update:modelValue', $event.target.value)"
+        @blur="$emit('blur')"
       />
     </div>
     <div v-if="isMax" class="d-flex align-end">
@@ -14,7 +15,7 @@
         variant="text"
         @click="max"
       >
-        <span class="my-text-color">Max</span>
+        <span class="my-text-color" :style="computedMaxBtn">Max</span>
       </v-btn>
     </div>
   </div>
@@ -23,19 +24,26 @@
 <script setup>
   import { validate } from "@/utils"
   import { computed } from "vue"
-  const props = defineProps(['modelValue', 'max', 'plain'])
-  const emits = defineEmits(['update:modelValue'])
+  const props = defineProps(['modelValue', 'max', 'plain', 'color'])
+  const emits = defineEmits(['update:modelValue', 'blur'])
 
   const computedMyInput = computed(() => {
     if (!!!props.plain) {
       return {
         height: '60px',
         fontWeight: 'bold',
-        fontSize: '50px'
+        fontSize: '50px',
+        color: `${props.color} !important` || ''
       }
     }
     return {
-      height: '40px'
+      height: '40px',
+    }
+  })
+
+  const computedMaxBtn = computed(() => {
+    return {
+      color: `${props.color} !important` || ''
     }
   })
 

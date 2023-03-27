@@ -65,6 +65,10 @@ export const useMintStore = defineStore({
       await this.clearData()
       console.log('mint init data')
       const { xenContract, wallet } = useWalletStore()
+      if (!wallet.account) {
+        console.log('no wallet connected yet, return.')
+        return
+      }
       const [maxTerm, userMints, globalRank, cAmp, cEaar] = await Promise.all([
         xenContract.getCurrentMaxTerm(),
         xenContract.userMints(wallet.account),
