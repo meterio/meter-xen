@@ -5,9 +5,9 @@
         <v-col cols="2" sm="3">
           <div class="d-flex align-center fill-height white-text">
             <!-- <h4>MeterMen</h4> -->
-            <v-img v-if="!mobile" :width="50" :height="40" src="/logo.svg"></v-img>
+            <v-img v-if="!mobile" :height="40" src="/logo.svg"></v-img>
             <div v-else :style="{ borderRadius: '100%', overflow: 'hidden' }">
-              <v-img class="d-block" :width="50" :height="40" src="/icon.jpg"></v-img>
+              <v-img class="d-block" :width="40" :height="40" src="/icon.jpg"></v-img>
             </div>
           </div>
         </v-col>

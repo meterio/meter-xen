@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-4 my-4 white-bg" :class="{'mx-1': !mobile}" :style="backgroundImage">
+  <v-card elevation="6" class="pa-4 my-4 white-bg" :class="{'mx-6': !mobile}" :style="backgroundImage">
     <v-card-title class="pl-0 white-text">New MENFT <span v-if="!!nextNFTNum">#{{ nextNFTNum }}</span></v-card-title>
 
     <m-alert :type="alertInfo.type" :msg="alertInfo.msg"></m-alert>
