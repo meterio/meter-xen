@@ -13,7 +13,7 @@
         </v-col>
         <v-col cols="8" sm="6">
           <div class="d-flex justify-center align-center fill-height">
-            <v-slide-group v-model="model" center-active>
+            <v-slide-group v-model="model" @update:model-value="updateModel" center-active>
               <v-slide-group-item v-slot="{ isSelected, toggle }">
                 <v-btn rounded="pill" color="my-color" :active="isSelected" @click="toggle" elevation="0">
                   Mint
@@ -104,80 +104,46 @@ const route = useRoute()
 const walletStore = useWalletStore()
 const { wallet } = storeToRefs(walletStore)
 
-// const linkValue = ref(0)
 if (route.path === '/') {
   router.push({
     name: 'MintStep1'
   })
 }
-// else if (route.path.includes('stake')) {
-//   linkValue.value = 1
-// }
 
 // --------------------------------------------
 const model = ref(null)
-// const mintBtnActive = ref(false)
-// const stakeBtnActive = ref(false)
-// const menftBtnActive = ref(false)
 const splitPath = route.path.split('/')
 if (splitPath.includes('mint')) {
-  mintBtnActive.value = true
   model.value = 0
 } else if (splitPath.includes('stake')) {
-  // stakeBtnActive.value = true
   model.value = 1
 } else if (splitPath.includes('menft')) {
-  // menftBtnActive.value = true
   model.value = 2
 } else {
-  // mintBtnActive.value = true
   model.value = 0
 }
 
-// watchEffect(() => {
-//   if (mintBtnActive.value) {
-//     stakeBtnActive.value = false
-//     menftBtnActive.value = false
-//   }
-// })
-// watchEffect(() => {
-//   if (stakeBtnActive.value) {
-//     mintBtnActive.value = false
-//     menftBtnActive.value = false
-//   }
-// })
-// watchEffect(() => {
-//   if (menftBtnActive.value) {
-//     mintBtnActive.value = false
-//     stakeBtnActive.value = false
-//   }
-// })
-
 const goMint = () => {
   mintStore.initData()
-  // mintBtnActive.value = true
   router.push({
     name: 'MintStep1'
   })
 }
 const goStake = () => {
   stakeStore.initData()
-  // stakeBtnActive.value = true
   router.push({
     name: 'StakeStep1'
   })
 }
 const goMENFT = () => {
   menftStore.initData()
-  // menftBtnActive.value = true
   router.push({
     name: 'MintMENFT'
   })
 }
 
-watchEffect(() => {
-  console.log('model', model.value)
-  switch (model.value) {
+const updateModel = (model) => {
+  switch (model) {
     case 0:
       goMint()
       break;
@@ -190,7 +156,7 @@ watchEffect(() => {
     default:
       break;
   }
-})
+}
 
 const isSupport = computed(() => {
   const chain = chains.find(c => c.networkId === wallet.value.networkId)

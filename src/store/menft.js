@@ -18,8 +18,11 @@ export const useMenftStore = defineStore({
     xenAmount: 0,
     approvedMEN: 0,
     genesisTs: 0,
+    mintFee: 0,
 
-    error: ''
+    error: '',
+
+    mintLoading: false
   }),
   getters: {},
   actions: {
@@ -30,6 +33,8 @@ export const useMenftStore = defineStore({
       this.approvedMEN = 0
       this.genesisTs = 0
       this.error = ''
+      this.mintFee = 0
+      this.mintLoading = false
     },
     async initData() {
       await this.clearData()
@@ -39,11 +44,12 @@ export const useMenftStore = defineStore({
         console.log('no wallet connected yet, return.')
         return
       }
-      const [maxTerm, threshold, xenAmount, genesisTs] = await Promise.all([
+      const [maxTerm, threshold, xenAmount, genesisTs, mintFee] = await Promise.all([
         xenContract.getCurrentMaxTerm(),
         menftContract.LIMITED_CATEGORY_TIME_THRESHOLD(),
         xenContract.balanceOf(wallet.account),
-        menftContract.genesisTs()
+        menftContract.genesisTs(),
+        xenContract.mintValue()
       ])
       // console.log('menft max term', BigNumber.from(maxTerm).div(24 * 3600).toNumber())
       this.maxTerm = BigNumber.from(maxTerm).div(24 * 3600).toNumber()
@@ -51,6 +57,8 @@ export const useMenftStore = defineStore({
       // console.log('xen amount', BigNumber.from(xenAmount).div((10 ** 18).toString()).toNumber())
       this.xenAmount = BigNumber.from(xenAmount).div((10 ** 18).toString()).toNumber()
       this.genesisTs = BigNumber.from(genesisTs).toNumber()
+      
+      this.mintFee = BigNumber.from(mintFee).div((10 ** 17).toString()).toNumber() / 10
 
       this.getMenAllowance()
     },
@@ -112,7 +120,41 @@ export const useMenftStore = defineStore({
       this.error = ''
       const txinfoStore = useTxinfoStore()
       const uuid = uuidv4()
+      const approveId = uuidv4()
       try {
+        this.mintLoading = true
+        const { menftContract, wallet } = useWalletStore()
+        const network = chains.find(c => c.networkId === wallet.networkId)
+        const mtrgContract = new ethers.Contract(network.mtrgAddr, xenABI, wallet.signer)
+
+        const mintValue = (count * this.mintFee * (10 ** 18)).toString()
+        const mtrgBalance = await mtrgContract.balanceOf(wallet.account)
+        if (BigNumber.from(mintValue).gt(mtrgBalance)) {
+          this.error = "Insufficient MTRG balance."
+          this.mintLoading = false
+          return
+        }
+
+        const allowance = await mtrgContract.allowance(wallet.account, network.menftContract)
+        if (BigNumber.from(allowance).lt(mintValue)) {
+          
+          txinfoStore.updateTxinfos({
+            id: approveId,
+            hash: '',
+            title: 'Approve MTRG',
+            status: 'pending'
+          })
+          const approveTx = await mtrgContract.approve(network.menftContract, mintValue)
+
+          await approveTx.wait()
+
+          txinfoStore.updateTxinfos({
+            id: approveId,
+            hash: approveTx.hash,
+            title: 'Approve MTRG',
+            status: 'over'
+          })
+        }
         txinfoStore.updateTxinfos({
           id: uuid,
           hash: '',
@@ -120,7 +162,6 @@ export const useMenftStore = defineStore({
           status: 'pending'
         })
 
-        const { xenContract, menftContract, wallet } = useWalletStore()
         const tx = await menftContract.bulkClaimRankLimited(count, term, burning)
         await tx.wait()
 
@@ -130,10 +171,15 @@ export const useMenftStore = defineStore({
           title: 'Mint MENFT',
           status: 'over'
         })
+
+        this.mintLoading = false
+
+        this.initData()
       } catch(e) {
-        
+        this.mintLoading = false
         this.error = getErrorMsg(e.message)
         txinfoStore.removeTxinfo({ id: uuid })
+        txinfoStore.removeTxinfo({ id: approveId })
         console.log('bulk claim rank limited error', e)
       }
     },
@@ -141,7 +187,41 @@ export const useMenftStore = defineStore({
       this.error = ''
       const txinfoStore = useTxinfoStore()
       const uuid = uuidv4()
+      const approveId = uuidv4()
       try {
+        this.mintLoading = true
+        const { menftContract, wallet } = useWalletStore()
+        const network = chains.find(c => c.networkId === wallet.networkId)
+        const mtrgContract = new ethers.Contract(network.mtrgAddr, xenABI, wallet.signer)
+
+        const mintValue = (count * this.mintFee * (10 ** 18)).toString()
+        const mtrgBalance = await mtrgContract.balanceOf(wallet.account)
+        if (BigNumber.from(mintValue).gt(mtrgBalance)) {
+          this.error = "Insufficient MTRG balance."
+          this.mintLoading = false
+          return
+        }
+
+        const allowance = await mtrgContract.allowance(wallet.account, network.menftContract)
+        if (BigNumber.from(allowance).lt(mintValue)) {
+          
+          txinfoStore.updateTxinfos({
+            id: approveId,
+            hash: '',
+            title: 'Approve MTRG',
+            status: 'pending'
+          })
+          const approveTx = await mtrgContract.approve(network.menftContract, mintValue)
+
+          await approveTx.wait()
+
+          txinfoStore.updateTxinfos({
+            id: approveId,
+            hash: approveTx.hash,
+            title: 'Approve MTRG',
+            status: 'over'
+          })
+        }
         txinfoStore.updateTxinfos({
           id: uuid,
           hash: '',
@@ -149,7 +229,6 @@ export const useMenftStore = defineStore({
           status: 'pending'
         })
 
-        const { xenContract, menftContract, wallet } = useWalletStore()
         const tx = await menftContract.bulkClaimRank(count, term)
         await tx.wait()
 
@@ -159,9 +238,15 @@ export const useMenftStore = defineStore({
           title: 'Mint MENFT',
           status: 'over'
         })
+
+        this.mintLoading = false
+
+        this.initData()
       } catch(e) {
+        this.mintLoading = false
         this.error = getErrorMsg(e.message)
         txinfoStore.removeTxinfo({ id: uuid })
+        txinfoStore.removeTxinfo({ id: approveId })
         console.log('bulk claim rank error', e.message)
       }
     }

@@ -14,6 +14,10 @@
 
         <m-input v-model="days" :max="maxTerm" />
       </v-sheet>
+      <span class="my-text-color d-flex justify-space-between">
+        <span>Mint Fee</span>
+        <span>0.5 MTRG</span>
+      </span>
     </section>
     <section class="d-flex justify-space-between">
       <v-btn variant="plain" color="primary" class="pa-0" @click="isActive = true">Reward Calculator</v-btn>

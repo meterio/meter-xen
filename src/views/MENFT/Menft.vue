@@ -22,6 +22,10 @@
 
         <m-input v-model="VMUCount" :max="maxVMUCount" color="white" />
       </v-sheet>
+      <span class="white-text d-flex justify-space-between">
+        <span>Mint Fee</span>
+        <span>{{ mintFee * VMUCount }} MTRG</span>
+      </span>
     </section>
 
     <section class="mt-5">
@@ -127,7 +131,7 @@
       class="my-4"
       color="black"
       @click="startAction"
-      :loading="false"
+      :loading="mintLoading"
       :disabled="false"
       rounded="pill"
     >
@@ -145,7 +149,7 @@
   const { mobile } = useDisplay()
 
   const menftStore = useMenftStore()
-  const { maxTerm, limitedCatetoryTimeThreshold, xenAmount, approvedMEN, genesisTs, error } = storeToRefs(menftStore)
+  const { maxTerm, limitedCatetoryTimeThreshold, xenAmount, approvedMEN, genesisTs, error, mintFee, mintLoading } = storeToRefs(menftStore)
 
   let alertInfo = reactive({
     type: '',
@@ -180,7 +184,9 @@
 
   const term = ref(0)
   watchEffect(() => {
-    term.value = maxTerm.value 
+    if (maxTerm.value > 0) {
+      term.value = maxTerm.value 
+    }
   })
   watch(term, (val) => {
     if (Number(val) <= 0) {
@@ -269,9 +275,9 @@
     image: 'linear-gradient(145deg, black, darkmagenta)'
   }]
   const categoryObj = {
+    Collector: collectorList,
     Apex: apeList,
     Limited: limitedList,
-    Collector: collectorList
   }
   const categoryItems = Object.keys(categoryObj)
   const category = ref(categoryItems[0])
@@ -367,13 +373,13 @@
   const burnInputBlur = () => {
     if (category.value !== 'Collector') {
       const classVal = categoryObj[category.value].find(c => c.name === nftClass.value)
-      console.log('classVal', classVal)
+      // console.log('classVal', classVal)
       if (Number(menToBurn.value) < Number(classVal.minMen) || Number(menToBurn.value) > Number(classVal.maxMen)) {
-        console.log(Number(menToBurn.value) < Number(classVal.minMen))
-        console.log(Number(menToBurn.value) > Number(classVal.maxMen))
+        // console.log(Number(menToBurn.value) < Number(classVal.minMen))
+        // console.log(Number(menToBurn.value) > Number(classVal.maxMen))
         setTimeout(() => {
           menToBurn.value = classVal.minMen
-        }, 1000);
+        }, 1);
       }
     }
   }

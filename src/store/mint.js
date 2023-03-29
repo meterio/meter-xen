@@ -244,6 +244,8 @@ export const useMintStore = defineStore({
         })
 
         this.claimRewardLoading = false
+
+        this.initData()
       } catch(e) {
         txinfoStore.removeTxinfo({ id: claimRewardId })
         console.log(e)
@@ -280,6 +282,8 @@ export const useMintStore = defineStore({
         })
 
         this.claimRewardAndShareLoading = false
+
+        this.initData()
       } catch (e) {
         txinfoStore.removeTxinfo({ id: claimRewardShareId })
         this.claimRewardAndShareLoading = false
@@ -317,6 +321,7 @@ export const useMintStore = defineStore({
         })
 
         this.claimRewardAndStakeLoading = false
+        this.initData()
       } catch (e) {
         txinfoStore.removeTxinfo({ id: claimRewardStakeId })
         this.claimRewardAndStakeLoading = false
