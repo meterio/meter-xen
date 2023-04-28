@@ -30,9 +30,8 @@
 
 <script setup>
   import BottomPage from '@/layouts/Bottom.vue'
-  import { computed, ref } from "vue"
+  import { computed } from "vue"
   import { useRouter, useRoute } from "vue-router"
-  import { useDisplay } from "vuetify"
   import useMaxWidth from "@/hooks/useMaxWidth"
 
   const maxWidth = useMaxWidth()

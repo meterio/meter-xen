@@ -35,3 +35,11 @@ export const getErrorMsg = (errorStr) => {
     return errorStr
   }
 }
+
+export const calEAARate = (globalRank) => {
+  const EAA_PM_STEP = 1, EAA_RANK_STEP = 100000, EAA_PM_START = 100
+  const decrease = Math.floor((EAA_PM_STEP * globalRank) / EAA_RANK_STEP)
+
+  if (decrease > EAA_PM_START) return 0;
+  return EAA_PM_START - decrease
+}

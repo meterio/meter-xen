@@ -58,7 +58,12 @@ const routes = [
           {
             path: 'mintmenft',
             name: 'MintMENFT',
-            component: () => import('@/views/MENFT/Menft.vue')
+            component: () => import('@/views/MENFT/MintNFT')
+          },
+          {
+            path: 'mynfts',
+            name: 'MyNFTS',
+            component: () => import('@/views/MENFT/MyNFT')
           }
         ]
       }

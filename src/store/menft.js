@@ -61,6 +61,10 @@ export const useMenftStore = defineStore({
       this.mintFee = BigNumber.from(mintFee).div((10 ** 17).toString()).toNumber() / 10
 
       this.getMenAllowance()
+
+      router.push({
+        name: "MintMENFT"
+      })
     },
     async getNFTLeft(tier) {
       const { xenContract, menftContract, wallet } = useWalletStore()

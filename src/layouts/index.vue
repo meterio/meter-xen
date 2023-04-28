@@ -50,6 +50,8 @@
   const getIcon = (status) => {
     if (status === 'pending') {
       return 'mdi:mdi-loading'
+    } else if(status === 'error') {
+      return 'mdi:mdi-close'
     } else {
       return 'mdi:mdi-check-bold'
     }
