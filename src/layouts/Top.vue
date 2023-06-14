@@ -5,10 +5,12 @@
         <v-col cols="2" sm="3">
           <div class="d-flex align-center fill-height white-text">
             <!-- <h4>MeterMen</h4> -->
-            <v-img v-if="!mobile" :height="40" src="/logo.svg"></v-img>
-            <div v-else :style="{ borderRadius: '100%', overflow: 'hidden' }">
-              <v-img class="d-block" :width="40" :height="40" src="/icon.jpg"></v-img>
+            <!-- <v-img v-if="!mobile" :height="40" src="/logo.svg"></v-img> -->
+            <div :style="{ borderRadius: '100%', overflow: 'hidden' }">
+              <v-img :width="30" :height="30" src="/icon.jpg"></v-img>
+              
             </div>
+            <h4 v-if="!mobile" class="font-italic">Transporter</h4>
           </div>
         </v-col>
         <v-col cols="8" sm="6">

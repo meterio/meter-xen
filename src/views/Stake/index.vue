@@ -22,7 +22,7 @@
 
       <router-view />
 
-      <bottom-page />
+      <!-- <bottom-page /> -->
 
     </v-responsive>
   </v-container>
